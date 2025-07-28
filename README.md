@@ -11,4 +11,9 @@ El sistema permite iniciar sesión con usuario y contraseña, registrar ventas d
 - Gradle como sistema de construcción
 - Apache POI para la creación de archivos Excel
 
+## 🤝 Contribuciones
+
+Este proyecto es personal, pero cualquier sugerencia es bienvenida.  
+
 ### 🚧 En desarrollo...
+

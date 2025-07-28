@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.cafeteriapos.controllers.MainController"
+            stylesheets="@../styles/styles.css">
+
+    <!-- Panel lateral izquierdo - Menú de opciones -->
+    <left>
+        <VBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #f4f4f4;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <Label text="Menú Principal" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            
+            <Button text="Registrar venta" 
+                    onAction="#abrirVenta"
+                    style="-fx-font-size: 14px;"
+                    maxWidth="Infinity"/>
+                    
+            <Button text="Gestión de Productos" 
+                    onAction="#abrirProductos"
+                    style="-fx-font-size: 14px;"
+                    maxWidth="Infinity"/>
+                    
+            <Button text="Estadísticas" 
+                    onAction="#abrirEstadisticas"
+                    style="-fx-font-size: 14px;"
+                    maxWidth="Infinity"/>
+                    
+            <Button text="Cerrar sesión" 
+                    onAction="#cerrarSesion"
+                    style="-fx-font-size: 14px; -fx-text-fill: red;"
+                    maxWidth="Infinity"/>
+        </VBox>
+    </left>
+
+    <!-- Panel central dinámico -->
+    <center>
+        <StackPane fx:id="contenidoPane" style="-fx-background-color: white;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <!-- Contenido inicial -->
+            <VBox alignment="CENTER" spacing="20">
+                <Label text="Bienvenido al Sistema POS" 
+                       style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Label text="Seleccione una opción del menú para comenzar" 
+                       style="-fx-font-size: 14px; -fx-text-fill: #555;"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+</BorderPane>
