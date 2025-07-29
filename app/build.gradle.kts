@@ -1,6 +1,8 @@
 plugins {
     application
     id("org.openjfx.javafxplugin") version "0.1.0"
+    id "org.sonarqube" version "4.4.1.3373"  // Plugin de SonarQube
+    id "jacoco"  version "0.8.10"  // Plugin de JaCoCo para cobertura de código
 }
 
 repositories {
