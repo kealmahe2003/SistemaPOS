@@ -1,27 +1,36 @@
 name: SonarQube Scan
-on:
-  push:
-    branches: [ main ]  # Analiza al hacer push a main
-  pull_request:
-    branches: [ main ]  # Analiza en PRs a main
+on: [push, pull_request]
 
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Necesario para análisis de SonarQube
-
-      - name: Set up JDK (si es Java)
-        if: matrix.language == 'java'
+      
+      # Configura Java + Gradle
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
+      # Genera reportes de cobertura (opcional, pero recomendado)
+      - name: Run tests with coverage
+        run: ./gradlew test jacocoTestReport
+
+      # Ejecuta SonarQube
       - name: Run SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Necesario para reportar status en PRs
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para comentarios en PRs
+        with:
+          args: >
+            -Dsonar.projectKey=tu_usuario_github_nombre-repo
+            -Dsonar.organization=tu_usuario_github
+            -Dsonar.java.binaries=build/classes/java/main
+            -Dsonar.kotlin.binaries=build/classes/kotlin/main
+            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
