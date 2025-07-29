@@ -2,7 +2,7 @@ plugins {
     application
     id("org.openjfx.javafxplugin") version "0.1.0"
     id("org.sonarqube") version "4.4.1.3373"  // Sintaxis correcta para Kotlin DSL
-    id("jacoco") version "0.8.10"             // Sintaxis correcta para Kotlin DSL
+    id("jacoco")
 }
 
 repositories {
