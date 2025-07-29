@@ -1,25 +1,39 @@
 name: SonarQube Scan
+<<<<<<< HEAD
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+=======
+on: [push, pull_request]
+>>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
 
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+<<<<<<< HEAD
         with:
           fetch-depth: 0  # Necesario para el análisis de SonarQube
 
       # Configura Java 17
       - name: Set up JDK 17
+=======
+      
+      # Configura Java + Gradle
+      - name: Set up JDK
+>>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
+<<<<<<< HEAD
       # Permisos para gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -31,10 +45,18 @@ jobs:
           ./gradlew jacocoTestReport
 
       # Ejecuta el análisis de SonarQube
+=======
+      # Genera reportes de cobertura (opcional, pero recomendado)
+      - name: Run tests with coverage
+        run: ./gradlew test jacocoTestReport
+
+      # Ejecuta SonarQube
+>>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
       - name: Run SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+<<<<<<< HEAD
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para integración con PRs
         with:
           args: >
@@ -47,3 +69,13 @@ jobs:
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
             -Dsonar.language=java,kotlin
             -Dsonar.sourceEncoding=UTF-8
+=======
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para comentarios en PRs
+        with:
+          args: >
+            -Dsonar.projectKey=tu_usuario_github_nombre-repo
+            -Dsonar.organization=tu_usuario_github
+            -Dsonar.java.binaries=build/classes/java/main
+            -Dsonar.kotlin.binaries=build/classes/kotlin/main
+            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+>>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
