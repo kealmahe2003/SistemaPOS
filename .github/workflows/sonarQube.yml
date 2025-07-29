@@ -1,0 +1,27 @@
+name: SonarQube Scan
+on:
+  push:
+    branches: [ main ]  # Analiza al hacer push a main
+  pull_request:
+    branches: [ main ]  # Analiza en PRs a main
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Necesario para análisis de SonarQube
+
+      - name: Set up JDK (si es Java)
+        if: matrix.language == 'java'
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Necesario para reportar status en PRs
