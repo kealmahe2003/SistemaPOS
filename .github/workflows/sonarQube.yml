@@ -1,13 +1,19 @@
 name: SonarQube Scan
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+<<<<<<< HEAD
 =======
 on: [push, pull_request]
 >>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
+=======
+>>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
 
 jobs:
   sonarqube:
@@ -15,25 +21,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
         with:
           fetch-depth: 0  # Necesario para el análisis de SonarQube
 
       # Configura Java 17
       - name: Set up JDK 17
+<<<<<<< HEAD
 =======
       
       # Configura Java + Gradle
       - name: Set up JDK
 >>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
+=======
+>>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
-      
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
       # Permisos para gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -45,6 +57,7 @@ jobs:
           ./gradlew jacocoTestReport
 
       # Ejecuta el análisis de SonarQube
+<<<<<<< HEAD
 =======
       # Genera reportes de cobertura (opcional, pero recomendado)
       - name: Run tests with coverage
@@ -52,11 +65,16 @@ jobs:
 
       # Ejecuta SonarQube
 >>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
+=======
+>>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
       - name: Run SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para integración con PRs
         with:
           args: >
@@ -68,6 +86,7 @@ jobs:
             -Dsonar.sources=src/main/java,src/main/kotlin
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
             -Dsonar.language=java,kotlin
+<<<<<<< HEAD
             -Dsonar.sourceEncoding=UTF-8
 =======
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para comentarios en PRs
@@ -79,3 +98,6 @@ jobs:
             -Dsonar.kotlin.binaries=build/classes/kotlin/main
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
 >>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
+=======
+            -Dsonar.sourceEncoding=UTF-8
+>>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7

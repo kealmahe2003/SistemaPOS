@@ -42,6 +42,10 @@ public class VentasController {
             new Producto("Sandwich", 4.50)
         );
     }
+
+    private void cargarProductosDisponibles() {
+    productosDisponibles.setAll(ProductoService.getProductos()); // O desde ExcelManager
+}
     
     @FXML
     private void agregarAlCarrito() {
