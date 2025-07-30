@@ -165,7 +165,7 @@ public class VentasController {
             // Actualizar stocks
             venta.getItems().forEach(item -> {
                 Producto p = item;
-                p.setStock(p.getStock() - p.getStock()); // You may want to adjust this line depending on your logic
+                p.setStock(p.getStock() - item.getCantidad()); // Subtract the quantity sold from the stock
                 ExcelManager.guardarProducto(p);
             });
 
