@@ -1,103 +1,54 @@
-name: SonarQube Scan
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
+name: SonarQube Analysis
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-<<<<<<< HEAD
-=======
-on: [push, pull_request]
->>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
-=======
->>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
 
 jobs:
-  sonarqube:
+  sonarqube-scan:
+    name: SonarQube Scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Necesario para el análisis de SonarQube
+          fetch-depth: 0  # Necesario para análisis completo de SonarQube
 
-      # Configura Java 17
       - name: Set up JDK 17
-<<<<<<< HEAD
-=======
-      
-      # Configura Java + Gradle
-      - name: Set up JDK
->>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
-=======
->>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
-      # Permisos para gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Compila y genera reportes de cobertura
-      - name: Build and generate coverage reports
-        run: |
-          ./gradlew clean build
-          ./gradlew jacocoTestReport
+      - name: Build with Gradle
+        run: ./gradlew clean build
 
-      # Ejecuta el análisis de SonarQube
-<<<<<<< HEAD
-=======
-      # Genera reportes de cobertura (opcional, pero recomendado)
-      - name: Run tests with coverage
-        run: ./gradlew test jacocoTestReport
+      - name: Generate Test Coverage
+        run: ./gradlew jacocoTestReport
 
-      # Ejecuta SonarQube
->>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
-=======
->>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
       - name: Run SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para integración con PRs
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: >
             -Dsonar.projectKey=kealmahe2003_SistemaPOS
             -Dsonar.organization=kealmahe2003
             -Dsonar.projectName=SistemaPOS
+            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.java.binaries=build/classes/java/main
             -Dsonar.kotlin.binaries=build/classes/kotlin/main
-            -Dsonar.sources=src/main/java,src/main/kotlin
+            -Dsonar.sources=src/main/java
+            -Dsonar.tests=src/test/java
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
-            -Dsonar.language=java,kotlin
-<<<<<<< HEAD
             -Dsonar.sourceEncoding=UTF-8
-=======
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para comentarios en PRs
-        with:
-          args: >
-            -Dsonar.projectKey=tu_usuario_github_nombre-repo
-            -Dsonar.organization=tu_usuario_github
-            -Dsonar.java.binaries=build/classes/java/main
-            -Dsonar.kotlin.binaries=build/classes/kotlin/main
-            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
->>>>>>> a3a0eb259bfc1b8ed4868266d0f07e6b8ccaecfc
-=======
-            -Dsonar.sourceEncoding=UTF-8
->>>>>>> 8f5c28026de0d89e6ae05897848c28d1854c83d7
+            -Dsonar.java.source=17
+            -Dsonar.junit.reportPaths=build/test-results/test
+            -Dsonar.language=java

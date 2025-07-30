@@ -7,50 +7,56 @@
 <BorderPane xmlns="http://javafx.com/javafx/17" 
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.cafeteriapos.controllers.VentasController"
-            stylesheets="@../styles/ventas.css">
+            stylesheets="@/styles/ventas.css">
 
     <top>
-        <ToolBar>
-            <Label text="Módulo de Ventas" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-            <TextField fx:id="tfBusqueda" promptText="Buscar producto..." style="-fx-min-width: 300px;"/>
+        <ToolBar styleClass="toolbar">
+            <Label text="Módulo de Ventas" styleClass="titulo-modulo"/>
+            <TextField fx:id="tfBusqueda" promptText="Buscar producto..." styleClass="campo-busqueda"/>
+            <Button text="Nueva Venta" onAction="#limpiarCarrito" styleClass="boton-nuevo"/>
         </ToolBar>
     </top>
 
     <center>
-        <SplitPane dividerPositions="0.7">
-            <!-- Panel izquierdo: Productos disponibles -->
-            <VBox spacing="10">
-                <Label text="Productos Disponibles:" style="-fx-font-weight: bold;"/>
-                <TableView fx:id="tablaProductos">
+        <SplitPane dividerPositions="0.6" styleClass="split-pane">
+            <!-- Panel izquierdo: Productos -->
+            <VBox spacing="10" styleClass="panel-productos">
+                <TableView fx:id="tablaProductos" styleClass="tabla-productos">
                     <columns>
-                        <TableColumn text="Nombre" fx:id="columnaNombre" prefWidth="200"/>
-                        <TableColumn text="Precio ($)" fx:id="columnaPrecio" prefWidth="100"/>
+                        <TableColumn text="Nombre" fx:id="columnaNombre" styleClass="columna-nombre" prefWidth="180"/>
+                        <TableColumn text="Precio ($)" fx:id="columnaPrecio" styleClass="columna-precio" prefWidth="100"/>
+                        <TableColumn text="Stock" fx:id="columnaStock" styleClass="columna-stock" prefWidth="80"/>
                     </columns>
                 </TableView>
-                <HBox spacing="10" alignment="CENTER_RIGHT">
-                    <Button text="Agregar al carrito" onAction="#agregarAlCarrito" 
-                            style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="botonera-productos">
+                    <Button text="Agregar al Carrito" onAction="#agregarAlCarrito" styleClass="boton-agregar"/>
                 </HBox>
             </VBox>
 
             <!-- Panel derecho: Carrito -->
-            <VBox spacing="10">
-                <Label text="Carrito de Compras:" style="-fx-font-weight: bold;"/>
-                <ListView fx:id="listaCarrito" items="${controller.carrito}"/>
-                <HBox spacing="10" alignment="CENTER_RIGHT">
-                    <Label fx:id="lblTotal" text="Total: $0.00" style="-fx-font-weight: bold; -fx-font-size: 16;"/>
+            <VBox spacing="10" styleClass="panel-carrito">
+                <TableView fx:id="tablaCarrito" styleClass="tabla-carrito">
+                    <columns>
+                        <TableColumn text="Producto" fx:id="colCarritoNombre" prefWidth="150"/>
+                        <TableColumn text="Cantidad" fx:id="colCarritoCantidad" prefWidth="80"/>
+                        <TableColumn text="Subtotal ($)" fx:id="colCarritoSubtotal" prefWidth="100"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="total-container">
+                    <Label text="Total:" styleClass="label-total-text"/>
+                    <Label fx:id="lblTotal" text="$0.00" styleClass="label-total"/>
                 </HBox>
-                <HBox spacing="10" alignment="CENTER_RIGHT">
-                    <Button text="Remover selección" onAction="#removerDelCarrito" 
-                            style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
-                    <Button text="Finalizar venta" onAction="#finalizarVenta" 
-                            style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="botonera-carrito">
+                    <Button text="Remover 1" onAction="#removerDelCarrito" styleClass="boton-remover"/>
+                    <Button text="Finalizar Venta" onAction="#finalizarVenta" styleClass="boton-finalizar"/>
                 </HBox>
             </VBox>
         </SplitPane>
     </center>
 
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
+    <bottom>
+        <StatusBar styleClass="status-bar">
+            <Label text="Listo" styleClass="status-label"/>
+        </StatusBar>
+    </bottom>
 </BorderPane>

@@ -22,4 +22,9 @@ public class Producto {
     public String getNombre() { return nombre.get(); }
     public double getPrecio() { return precio.get(); }
     public int getStock() { return stock.get(); }
+
+    // Setters
+    public void setNombre(String nombre) { this.nombre.set(nombre); }
+    public void setPrecio(double precio) { this.precio.set(precio); }
+    public void setStock(int stock) { this.stock.set(stock); }
 }

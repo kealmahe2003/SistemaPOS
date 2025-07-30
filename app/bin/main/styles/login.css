@@ -1,0 +1,109 @@
+/* Estilos base */
+.root {
+    -fx-background-color: #f8f9fa; /* Propiedad JavaFX */
+    background-color: #f8f9fa;
+}
+
+/* Encabezado */
+.login-title {
+    -fx-font-size: 24px;
+    font-size: 24px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #343a40;
+    -fx-padding: 0 0 10 0; /* JavaFX usa números sin 'px' */
+    padding: 0 0 10 0;
+}
+
+/* Formulario */
+.login-form {
+    -fx-vgap: 15;
+    -fx-hgap: 10;
+}
+
+.login-label {
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #495057;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+.login-input {
+    -fx-pref-height: 38;
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    border-radius: 4px;
+    -fx-border-color: #ced4da;
+    border-color: #ced4da;
+    -fx-border-width: 1;
+    border-width: 1;
+    -fx-padding: 5 10;
+    padding: 5 10;
+}
+
+.login-input:focused {
+    -fx-border-color: #80bdff;
+    border-color:#80bdff;
+    -fx-effect: dropshadow(gaussian, rgba(0,123,255,0.25), 5, 0, 0, 0);
+}
+
+/* Botón */
+.login-button {
+    background-color: #28a745;
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    font-weight: bold;
+    -fx-font-weight: bold;
+    font-size: 14px;
+    -fx-font-size: 14px;
+    -fx-pref-width: 200;
+    -fx-pref-height: 40;
+    -fx-background-radius: 4;
+}
+
+.login-button:hover {
+    -fx-background-color: #218838;
+    background-color: #218838;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 1);
+}
+
+/* Pie de página */
+.login-footer {
+    -fx-font-size: 12px;
+    font-size: 12px;
+    -fx-text-fill: #6c757d;
+    -fx-padding: 20 0 0 0;
+    padding: 20 0 0 0;
+}
+
+/* Errores */
+.error-border {
+    -fx-border-color: #dc3545;
+    border-color: #dc3545;
+    -fx-border-width: 1.5;
+    border-width: 1.5;
+}
+
+/* Alertas */
+.dialog-pane {
+    -fx-font-family: "Segoe UI", Arial;
+    font-family: "Segoe UI", Arial;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+}
+
+.dialog-pane .button {
+    -fx-background-color: #28a745;
+    background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}

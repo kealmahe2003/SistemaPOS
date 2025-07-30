@@ -2,15 +2,41 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cafeteriapos.controllers.LoginController">
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cafeteriapos.controllers.LoginController"
+      alignment="CENTER" 
+      spacing="20"
+    styleClass="root"
+    stylesheets="@/styles/login.css">
+
+    <!-- Encabezado -->
+    <Label text="CAFETERÍA POS" styleClass="login-title"/>
+    
+    <!-- Formulario -->
+    <GridPane styleClass="login-form">
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT" minWidth="100"/>
+            <ColumnConstraints minWidth="200"/>
+        </columnConstraints>
+        
+        <Label text="Usuario:" styleClass="login-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="userField" promptText="Ingrese su usuario" styleClass="login-input" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        
+        <Label text="Contraseña:" styleClass="login-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <PasswordField fx:id="passwordField" promptText="Ingrese su contraseña" styleClass="login-input" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <!-- Botón -->
+    <Button text="Iniciar Sesión" onAction="#handleLogin" styleClass="login-button"/>
+
+    <!-- Pie de página -->
+    <Label text="Sistema POS v1.0" styleClass="login-footer"/>
+
     <padding>
-        <Insets top="50" right="50" bottom="50" left="50"/>
+        <Insets top="40" right="40" bottom="40" left="40"/>
     </padding>
-    <Label text="Sistema POS - Iniciar Sesión"/>
-    <TextField fx:id="userField" promptText="Usuario"/>
-    <PasswordField fx:id="passwordField" promptText="Contraseña"/>
-    <Button text="Iniciar Sesión" onAction="#handleLogin"/>
 </VBox>

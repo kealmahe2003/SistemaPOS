@@ -2,114 +2,167 @@ package com.cafeteriapos.utils;
 
 import com.cafeteriapos.models.Producto;
 import com.cafeteriapos.models.Venta;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelManager {
-    // Configuración
-    private static final String RUTA_ARCHIVO = "data/registros_pos.xlsx";
-    private static final String HOJA_VENTAS = "Ventas";
-    private static final String HOJA_PRODUCTOS = "Productos";
+    private static final String FILE_PATH = "data/registros_pos.xlsx";
+    private static final DateTimeFormatter DATE_FORMATTER = 
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    /**
-     * Registra una venta en el archivo Excel.
-     */
+
     public static void guardarVenta(Venta venta) {
-        try (Workbook workbook = cargarWorkbook()) {
-            Sheet hoja = workbook.getSheet(HOJA_VENTAS);
-            if (hoja == null) hoja = workbook.createSheet(HOJA_VENTAS);
-
-            // Crear fila
-            Row fila = hoja.createRow(hoja.getLastRowNum() + 1);
+        try (Workbook workbook = getOrCreateWorkbook()) {
+            Sheet sheet = getOrCreateSheet(workbook, "Ventas");
             
-            // Escribir datos
-            fila.createCell(0).setCellValue(venta.getId());
-            fila.createCell(1).setCellValue(venta.getFecha().toString());
-            fila.createCell(2).setCellValue(venta.getTotal());
-            
-            guardarWorkbook(workbook);
-        } catch (IOException e) {
-            manejarError("Error al guardar venta", e);
-        }
-    }
-
-    /**
-     * Guarda un producto en el archivo Excel.
-     */
-    public static void guardarProducto(Producto producto) {
-        try (Workbook workbook = cargarWorkbook()) {
-            Sheet hoja = workbook.getSheet(HOJA_PRODUCTOS);
-            if (hoja == null) {
-                hoja = workbook.createSheet(HOJA_PRODUCTOS);
-                // Crear headers si es nueva hoja
-                Row header = hoja.createRow(0);
-                header.createCell(0).setCellValue("Nombre");
-                header.createCell(1).setCellValue("Precio");
-                header.createCell(2).setCellValue("Stock");
+            // Crear headers si es la primera vez
+            if (sheet.getLastRowNum() == 0) {
+                crearHeadersVenta(sheet);
             }
-
-            Row fila = hoja.createRow(hoja.getLastRowNum() + 1);
-            fila.createCell(0).setCellValue(producto.getNombre());
-            fila.createCell(1).setCellValue(producto.getPrecio());
-            fila.createCell(2).setCellValue(producto.getStock());
-
-            guardarWorkbook(workbook);
+            
+            Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+            row.createCell(0).setCellValue(venta.getId());
+            row.createCell(1).setCellValue(venta.getFecha().format(DATE_FORMATTER));
+            row.createCell(2).setCellValue(venta.getTotal());
+            
+            saveWorkbook(workbook);
         } catch (IOException e) {
-            manejarError("Error al guardar producto", e);
+            handleError("Error al guardar venta", e);
         }
     }
 
-    /**
-     * Lee todos los productos desde Excel.
-     */
+    private static void crearHeadersVenta(Sheet sheet) {
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("ID Venta");
+        header.createCell(1).setCellValue("Fecha");
+        header.createCell(2).setCellValue("Total");
+    }
+
+    public static void guardarProducto(Producto producto) {
+        try (Workbook workbook = getOrCreateWorkbook()) {
+            Sheet sheet = getOrCreateSheet(workbook, "Productos");
+            
+            if (sheet.getLastRowNum() == 0) {
+                crearHeadersProducto(sheet);
+            }
+            
+            Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+            row.createCell(0).setCellValue(producto.getNombre());
+            row.createCell(1).setCellValue(producto.getPrecio());
+            row.createCell(2).setCellValue(producto.getStock());
+            
+            saveWorkbook(workbook);
+        } catch (IOException e) {
+            handleError("Error al guardar producto", e);
+        }
+    }
+
     public static List<Producto> leerProductos() {
         List<Producto> productos = new ArrayList<>();
-        try (Workbook workbook = cargarWorkbook()) {
-            Sheet hoja = workbook.getSheet(HOJA_PRODUCTOS);
-            if (hoja == null) return productos;
+        
+        try (Workbook workbook = getOrCreateWorkbook()) {
+            Sheet sheet = workbook.getSheet("Productos");
+            if (sheet == null) return productos;
 
-            for (Row fila : hoja) {
-                if (fila.getRowNum() == 0) continue; // Saltar header
-                
-                String nombre = fila.getCell(0).getStringCellValue();
-                double precio = fila.getCell(1).getNumericCellValue();
-                int stock = (int) fila.getCell(2).getNumericCellValue();
-                
-                productos.add(new Producto(nombre, precio, stock));
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                productos.add(new Producto(
+                    row.getCell(0).getStringCellValue(),
+                    row.getCell(1).getNumericCellValue(),
+                    (int) row.getCell(2).getNumericCellValue()
+                ));
             }
         } catch (IOException e) {
-            manejarError("Error al leer productos", e);
+            handleError("Error al leer productos", e);
         }
         return productos;
     }
 
-    // -- Métodos privados de apoyo -- //
-    private static Workbook cargarWorkbook() throws IOException {
-        File archivo = new File(RUTA_ARCHIVO);
-        if (!archivo.exists()) {
-            return new XSSFWorkbook(); // Crear nuevo si no existe
-        }
-        return WorkbookFactory.create(archivo);
+    private static void crearHeadersProducto(Sheet sheet) {
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("Nombre");
+        header.createCell(1).setCellValue("Precio");
+        header.createCell(2).setCellValue("Stock");
     }
 
-    private static void guardarWorkbook(Workbook workbook) throws IOException {
-        File archivo = new File(RUTA_ARCHIVO);
-        archivo.getParentFile().mkdirs(); // Crear directorio si no existe
-        try (FileOutputStream fos = new FileOutputStream(archivo)) {
+    public static void eliminarProducto(Producto producto) {
+        try (Workbook workbook = getOrCreateWorkbook()) {
+            Sheet sheet = workbook.getSheet("Productos");
+            if (sheet == null) return;
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row.getCell(0).getStringCellValue().equals(producto.getNombre())) {
+                    sheet.removeRow(row);
+                    break;
+                }
+            }
+            saveWorkbook(workbook);
+        } catch (IOException e) {
+            handleError("Error al eliminar producto", e);
+        }
+    }
+
+    public static void registrarOperacionCaja(String operacion) {
+        try (Workbook workbook = getOrCreateWorkbook()) {
+            Sheet sheet = getOrCreateSheet(workbook, "RegistroCaja");
+            
+            if (sheet.getLastRowNum() == 0) {
+                crearHeadersCaja(sheet);
+            }
+            
+            Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+            row.createCell(0).setCellValue(LocalDateTime.now().format(DATE_FORMATTER));
+            row.createCell(1).setCellValue(operacion);
+            
+            saveWorkbook(workbook);
+        } catch (IOException e) {
+            handleError("Error al registrar operación de caja", e);
+        }
+    }
+
+    private static void crearHeadersCaja(Sheet sheet) {
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("Fecha/Hora");
+        header.createCell(1).setCellValue("Operación");
+    }
+
+
+    private static Workbook getOrCreateWorkbook() throws IOException {
+        File file = new File(FILE_PATH);
+        if (!file.exists()) {
+            return new XSSFWorkbook();
+        }
+        return WorkbookFactory.create(file);
+    }
+
+    private static Sheet getOrCreateSheet(Workbook workbook, String sheetName) {
+        Sheet sheet = workbook.getSheet(sheetName);
+        if (sheet == null) {
+            sheet = workbook.createSheet(sheetName);
+        }
+        return sheet;
+    }
+
+    private static void saveWorkbook(Workbook workbook) throws IOException {
+        File file = new File(FILE_PATH);
+        file.getParentFile().mkdirs();
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             workbook.write(fos);
         }
     }
 
-    private static void manejarError(String mensaje, Exception e) {
-        System.err.println(mensaje + ": " + e.getMessage());
-        // En producción, usar Logger:
-        // Logger.error(mensaje, e);
+    private static void handleError(String message, Exception e) {
+        System.err.println(message + ": " + e.getMessage());
+        // Logger.error(message, e); // Implementar en producción
     }
 }
