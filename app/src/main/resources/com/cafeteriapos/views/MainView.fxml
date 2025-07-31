@@ -18,7 +18,7 @@
             
             <Label text="Menú Principal" styleClass="titulo-menu"/>
             
-            <Button text="Registrar Venta" 
+            <Button text="Ventas" 
                     onAction="#abrirVenta"
                     styleClass="boton-menu"/>
                     

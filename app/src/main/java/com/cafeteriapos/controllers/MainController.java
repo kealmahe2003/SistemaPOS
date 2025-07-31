@@ -14,9 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -31,38 +28,7 @@ public class MainController {
 
     @FXML
     private void abrirVenta() {
-        try {
-            // Verificación en dos pasos
-            String fxmlPath = "/com/cafeteriapos/views/VentasView.fxml";
-            URL resourceUrl = getClass().getResource(fxmlPath);
-            
-            if (resourceUrl == null) {
-                // Debug avanzado
-                Path devPath = Paths.get("src/main/resources" + fxmlPath);
-                System.err.println("Buscando en: " + devPath.toAbsolutePath());
-                System.err.println("Existe en dev: " + Files.exists(devPath));
-                
-                throw new IOException("Archivo FXML no encontrado en recursos empaquetados");
-            }
-
-            // Carga alternativa más robusta
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(resourceUrl);
-            Parent root = loader.load();
-            
-            // Reemplaza el contenido actual
-            contenidoPane.getChildren().setAll(root);
-            
-        } catch (IOException e) {
-            System.err.println("=== ERROR DETALLADO ===");
-            e.printStackTrace();
-            
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error Crítico");
-            alert.setHeaderText("Fallo al cargar el módulo");
-            alert.setContentText("Detalle técnico:\n" + e.getMessage());
-            alert.showAndWait();
-        }
+        cargarVista("/com/cafeteriapos/views/VentasView.fxml");
     }   
 
     @FXML

@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -48,7 +47,8 @@ public class ExcelManager {
     }
 
     public static void guardarProducto(Producto producto) {
-        try (Workbook workbook = getOrCreateWorkbook()) {
+        try {
+            Workbook workbook = getOrCreateWorkbook();
             Sheet sheet = getOrCreateSheet(workbook, "Productos");
             
             if (sheet.getLastRowNum() == 0) {
@@ -61,8 +61,32 @@ public class ExcelManager {
             row.createCell(2).setCellValue(producto.getStock());
             
             saveWorkbook(workbook);
-        } catch (IOException e) {
-            handleError("Error al guardar producto", e);
+            workbook.close(); // Cerrar explícitamente después de guardar
+        } catch (Exception e) {
+            System.err.println("Error al guardar producto: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Si falla, intentar recrear el archivo desde cero
+            try {
+                System.out.println("Intentando recrear archivo Excel...");
+                recreateExcelFile();
+                
+                // Intentar guardar otra vez con archivo limpio
+                Workbook newWorkbook = createNewWorkbook();
+                Sheet sheet = getOrCreateSheet(newWorkbook, "Productos");
+                
+                Row row = sheet.createRow(1); // Primera fila después del header
+                row.createCell(0).setCellValue(producto.getNombre());
+                row.createCell(1).setCellValue(producto.getPrecio());
+                row.createCell(2).setCellValue(producto.getStock());
+                
+                saveWorkbook(newWorkbook);
+                newWorkbook.close();
+                System.out.println("Producto guardado en archivo recreado");
+            } catch (Exception fallbackException) {
+                System.err.println("Error crítico al guardar producto: " + fallbackException.getMessage());
+                fallbackException.printStackTrace();
+            }
         }
     }
 
@@ -139,10 +163,48 @@ public class ExcelManager {
 
     private static Workbook getOrCreateWorkbook() throws IOException {
         File file = new File(FILE_PATH);
-        if (!file.exists()) {
-            return new XSSFWorkbook();
+        if (!file.exists() || file.length() == 0) {
+            return createNewWorkbook();
         }
-        return WorkbookFactory.create(file);
+        
+        // Intentar leer el archivo existente
+        try {
+            return WorkbookFactory.create(file);
+        } catch (Exception e) {
+            // Si hay error al leer el archivo (corrupto, ZLIB, etc.), crear uno nuevo
+            System.err.println("Archivo Excel corrupto, creando uno nuevo: " + e.getMessage());
+            // Hacer backup del archivo corrupto
+            File backupFile = new File(FILE_PATH + ".backup." + System.currentTimeMillis());
+            if (file.exists()) {
+                file.renameTo(backupFile);
+                System.out.println("Archivo corrupto respaldado como: " + backupFile.getName());
+            }
+            return createNewWorkbook();
+        }
+    }
+    
+    private static Workbook createNewWorkbook() throws IOException {
+        // Crear un nuevo workbook si el archivo no existe o está vacío
+        Workbook newWorkbook = new XSSFWorkbook();
+        
+        // Crear sheet de Productos con headers
+        Sheet productSheet = newWorkbook.createSheet("Productos");
+        Row header = productSheet.createRow(0);
+        header.createCell(0).setCellValue("Nombre");
+        header.createCell(1).setCellValue("Precio");
+        header.createCell(2).setCellValue("Stock");
+        
+        // Crear sheet de Ventas con headers
+        Sheet ventasSheet = newWorkbook.createSheet("Ventas");
+        Row ventasHeader = ventasSheet.createRow(0);
+        ventasHeader.createCell(0).setCellValue("ID");
+        ventasHeader.createCell(1).setCellValue("Fecha");
+        ventasHeader.createCell(2).setCellValue("Total");
+        ventasHeader.createCell(3).setCellValue("Detalle");
+        
+        // Guardar el archivo inmediatamente
+        saveWorkbook(newWorkbook);
+        return newWorkbook;
     }
 
     private static Sheet getOrCreateSheet(Workbook workbook, String sheetName) {
@@ -156,8 +218,25 @@ public class ExcelManager {
     private static void saveWorkbook(Workbook workbook) throws IOException {
         File file = new File(FILE_PATH);
         file.getParentFile().mkdirs();
+        
+        // Asegurar que el archivo anterior se elimine completamente
+        if (file.exists()) {
+            file.delete();
+        }
+        
         try (FileOutputStream fos = new FileOutputStream(file)) {
             workbook.write(fos);
+            fos.flush(); // Asegurar que se escriba completamente
+        }
+    }
+
+    private static void recreateExcelFile() throws IOException {
+        File file = new File(FILE_PATH);
+        if (file.exists()) {
+            // Hacer backup del archivo corrupto
+            File backupFile = new File(FILE_PATH + ".corrupted." + System.currentTimeMillis());
+            file.renameTo(backupFile);
+            System.out.println("Archivo corrupto respaldado como: " + backupFile.getName());
         }
     }
 

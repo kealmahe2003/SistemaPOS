@@ -6,57 +6,67 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17" 
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.cafeteriapos.controllers.VentasController"
-            stylesheets="@/styles/ventas.css">
+            fx:controller="com.cafeteriapos.controllers.VentasController">
 
     <top>
-        <ToolBar styleClass="toolbar">
-            <Label text="Módulo de Ventas" styleClass="titulo-modulo"/>
-            <TextField fx:id="tfBusqueda" promptText="Buscar producto..." styleClass="campo-busqueda"/>
-            <Button text="Nueva Venta" onAction="#limpiarCarrito" styleClass="boton-nuevo"/>
+        <ToolBar>
+            <Label text="Módulo de Ventas"/>
+            <TextField fx:id="tfBusqueda" promptText="Buscar producto..."/>
+            <Button text="Nueva Venta" onAction="#limpiarCarrito"/>
         </ToolBar>
     </top>
 
     <center>
-        <SplitPane dividerPositions="0.6" styleClass="split-pane">
+        <SplitPane dividerPositions="0.6">
             <!-- Panel izquierdo: Productos -->
-            <VBox spacing="10" styleClass="panel-productos">
-                <TableView fx:id="tablaProductos" styleClass="tabla-productos">
+            <VBox spacing="10">
+                <padding>
+                    <Insets top="10" bottom="10" left="10" right="10"/>
+                </padding>
+                <Label text="Productos Disponibles"/>
+                <TableView fx:id="tablaProductos">
                     <columns>
-                        <TableColumn text="Nombre" fx:id="columnaNombre" styleClass="columna-nombre" prefWidth="180"/>
-                        <TableColumn text="Precio ($)" fx:id="columnaPrecio" styleClass="columna-precio" prefWidth="100"/>
-                        <TableColumn text="Stock" fx:id="columnaStock" styleClass="columna-stock" prefWidth="80"/>
+                        <TableColumn text="Nombre" fx:id="columnaNombre" prefWidth="180"/>
+                        <TableColumn text="Precio" fx:id="columnaPrecio" prefWidth="100"/>
+                        <TableColumn text="Stock" fx:id="columnaStock" prefWidth="80"/>
                     </columns>
                 </TableView>
-                <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="botonera-productos">
-                    <Button text="Agregar al Carrito" onAction="#agregarAlCarrito" styleClass="boton-agregar"/>
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button text="Agregar al Carrito" onAction="#agregarAlCarrito"/>
                 </HBox>
             </VBox>
 
             <!-- Panel derecho: Carrito -->
-            <VBox spacing="10" styleClass="panel-carrito">
-                <TableView fx:id="tablaCarrito" styleClass="tabla-carrito">
+            <VBox spacing="10">
+                <padding>
+                    <Insets top="10" bottom="10" left="10" right="10"/>
+                </padding>
+                <Label text="Carrito de Compras"/>
+                <TableView fx:id="tablaCarrito">
                     <columns>
                         <TableColumn text="Producto" fx:id="colCarritoNombre" prefWidth="150"/>
                         <TableColumn text="Cantidad" fx:id="colCarritoCantidad" prefWidth="80"/>
-                        <TableColumn text="Subtotal ($)" fx:id="colCarritoSubtotal" prefWidth="100"/>
+                        <TableColumn text="Subtotal" fx:id="colCarritoSubtotal" prefWidth="100"/>
                     </columns>
                 </TableView>
-                <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="total-container">
-                    <Label text="Total:" styleClass="label-total-text"/>
-                    <Label fx:id="lblTotal" text="$0.00" styleClass="label-total"/>
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Label text="Total:"/>
+                    <Label fx:id="lblTotal" text="0.00"/>
                 </HBox>
-                <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="botonera-carrito">
-                    <Button text="Remover 1" onAction="#removerDelCarrito" styleClass="boton-remover"/>
-                    <Button text="Finalizar Venta" onAction="#finalizarVenta" styleClass="boton-finalizar"/>
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button text="Remover" onAction="#removerDelCarrito"/>
+                    <Button text="Finalizar Venta" onAction="#finalizarVenta"/>
                 </HBox>
             </VBox>
         </SplitPane>
     </center>
 
     <bottom>
-        <StatusBar styleClass="status-bar">
-            <Label text="Listo" styleClass="status-label"/>
-        </StatusBar>
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <padding>
+                <Insets top="5" bottom="5" left="10" right="10"/>
+            </padding>
+            <Label text="Sistema POS - Listo"/>
+        </HBox>
     </bottom>
 </BorderPane>

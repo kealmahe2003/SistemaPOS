@@ -13,6 +13,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class VentasController {
@@ -35,8 +37,38 @@ public class VentasController {
     private final ObservableList<Producto> productosDisponibles;
 
     public VentasController() {
-        productosDisponibles = FXCollections.observableArrayList(ExcelManager.leerProductos());
+        productosDisponibles = FXCollections.observableArrayList(cargarProductosSafely());
         productosFiltrados = new FilteredList<>(productosDisponibles);
+    }
+
+    private List<Producto> cargarProductosSafely() {
+        try {
+            List<Producto> productos = ExcelManager.leerProductos();
+            
+            // Si no hay productos, crear algunos en memoria sin guardar en Excel por ahora
+            if (productos.isEmpty()) {
+                System.out.println("No se encontraron productos. Usando productos de ejemplo en memoria...");
+                return crearProductosDeEjemploEnMemoria();
+            }
+            
+            return productos;
+        } catch (Exception e) {
+            System.err.println("Error al cargar productos desde Excel: " + e.getMessage());
+            System.err.println("Usando productos de ejemplo en memoria...");
+            // Retornar productos de ejemplo en memoria si hay error
+            return crearProductosDeEjemploEnMemoria();
+        }
+    }
+
+    private List<Producto> crearProductosDeEjemploEnMemoria() {
+        List<Producto> productos = new ArrayList<>();
+        productos.add(new Producto("Café Americano", 2.50, 50));
+        productos.add(new Producto("Café con Leche", 3.00, 45));
+        productos.add(new Producto("Croissant", 1.75, 20));
+        productos.add(new Producto("Muffin de Chocolate", 2.25, 15));
+        productos.add(new Producto("Sandwich Mixto", 4.50, 10));
+        System.out.println("Productos de ejemplo cargados en memoria.");
+        return productos;
     }
 
     @FXML
@@ -45,6 +77,23 @@ public class VentasController {
         configurarTablaCarrito();
         cargarProductos();
         configurarBusqueda();
+        aplicarEstilosCSS();
+    }
+
+    private void aplicarEstilosCSS() {
+        try {
+            // Intentar aplicar el CSS de ventas
+            String cssPath = getClass().getResource("/styles/ventas.css") != null 
+                ? getClass().getResource("/styles/ventas.css").toExternalForm()
+                : null;
+            
+            if (cssPath != null && tablaProductos.getScene() != null) {
+                tablaProductos.getScene().getStylesheets().add(cssPath);
+            }
+        } catch (Exception e) {
+            System.err.println("No se pudo aplicar el CSS: " + e.getMessage());
+            // Continuar sin CSS, la funcionalidad no se ve afectada
+        }
     }
 
     private void configurarTablaProductos() {

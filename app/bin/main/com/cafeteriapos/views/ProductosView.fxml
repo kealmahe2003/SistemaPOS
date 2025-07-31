@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cafeteriapos.controllers.ProductosController">
+    <top>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" bottom="10" left="10" right="10"/>
+            </padding>
+            <Label text="Gestión de Productos" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            
+            <!-- Formulario para agregar/editar productos -->
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="100" prefWidth="100"/>
+                    <ColumnConstraints minWidth="200" prefWidth="200"/>
+                    <ColumnConstraints minWidth="100" prefWidth="100"/>
+                    <ColumnConstraints minWidth="200" prefWidth="200"/>
+                </columnConstraints>
+                
+                <Label text="Nombre:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="tfNombre" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                
+                <Label text="Precio:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <TextField fx:id="tfPrecio" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                
+                <Label text="Stock:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Spinner fx:id="spinnerStock" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            </GridPane>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="Agregar" onAction="#agregarProducto"/>
+                <Button text="Actualizar" onAction="#actualizarProducto"/>
+                <Button text="Seleccionar" onAction="#seleccionarProducto"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <center>
+        <TableView fx:id="tablaProductos">
+            <columns>
+                <TableColumn text="Nombre" fx:id="columnaNombre" prefWidth="250"/>
+                <TableColumn text="Precio" fx:id="columnaPrecio" prefWidth="100"/>
+                <TableColumn text="Stock" fx:id="columnaStock" prefWidth="100"/>
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>
