@@ -1,3 +1,4 @@
+package com.cafeteriapos.models;
 
 
 import org.junit.jupiter.api.Test;
