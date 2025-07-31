@@ -5,25 +5,50 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+
+import java.util.Map;
 import java.util.Objects;
 
 public class LoginController {
+    @FXML private VBox rootContainer;
     @FXML private TextField userField;
     @FXML private PasswordField passwordField;
 
     @FXML
     private void handleLogin() {
+        // Limpiar estilos de error previos
+        userField.getStyleClass().remove("error-border");
+        passwordField.getStyleClass().remove("error-border");
+        
+        // Validaciones
         String user = userField.getText().trim();
         String password = passwordField.getText().trim();
+        boolean isValid = true;
+
+        if (user.isEmpty()) {
+            userField.getStyleClass().add("error-border");
+            isValid = false;
+        }
+
+        if (password.isEmpty()) {
+            passwordField.getStyleClass().add("error-border");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            mostrarAlerta("Error", "Complete todos los campos");
+            return;
+        }
 
         if (AuthService.validarCredenciales(user, password)) {
             abrirDashboard();
             cerrarVentanaActual();
         } else {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de autenticación", 
-                "Credenciales incorrectas", "Verifique usuario y contraseña");
+            passwordField.getStyleClass().add("error-border");
+            mostrarAlerta("Error", "Credenciales incorrectas");
         }
     }
 
@@ -32,40 +57,59 @@ public class LoginController {
             Parent root = FXMLLoader.load(Objects.requireNonNull(
                 getClass().getResource("/com/cafeteriapos/views/MainView.fxml")
             ));
+            
             Stage stage = new Stage();
             stage.setTitle("Dashboard - Sistema POS");
             stage.setScene(new Scene(root));
+            
+            // Configuración de tamaño
+            stage.setMinWidth(1024);
+            stage.setMinHeight(768);
             stage.setMaximized(true);
+            
             stage.show();
         } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", 
-                "No se pudo cargar el dashboard", e.getMessage());
+            mostrarAlerta("Error Crítico", 
+                "No se pudo iniciar el sistema: " + e.getMessage());
         }
     }
 
     private void cerrarVentanaActual() {
-        Window window = userField.getScene().getWindow();
-        if (window instanceof Stage) {
-            ((Stage) window).close();
-        }
+        ((Stage) userField.getScene().getWindow()).close();
     }
 
-    private void mostrarAlerta(Alert.AlertType tipo, String titulo, 
-                             String header, String contenido) {
-        Alert alert = new Alert(tipo);
+    @FXML
+    private void handleClose() {
+        cerrarVentanaActual();
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
-        alert.setHeaderText(header);
-        alert.setContentText(contenido);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        
+        // Estilo CSS para alertas
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(
+            Objects.requireNonNull(
+                getClass().getResource("/styles/login.css")
+            ).toExternalForm()
+        );
+        dialogPane.getStyleClass().add("alert-dialog");
+        
         alert.showAndWait();
     }
 
-    // Clase interna para manejo de autenticación (puede moverse a paquete 'services')
+    // Servicio de autenticación (puede moverse a paquete 'services')
     private static class AuthService {
-        private static final String USUARIO_VALIDO = "admin";
-        private static final String CONTRASENA_VALIDA = "admin123";
+        private static final Map<String, String> USUARIOS = Map.of(
+            "admin", "admin123",
+            "cajero", "cajero456"
+        );
 
         public static boolean validarCredenciales(String usuario, String contrasena) {
-            return USUARIO_VALIDO.equals(usuario) && CONTRASENA_VALIDA.equals(contrasena);
+            return USUARIOS.getOrDefault(usuario, "").equals(contrasena);
         }
     }
 }

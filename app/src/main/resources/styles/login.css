@@ -1,0 +1,209 @@
+/* Modern Login Form CSS - Adapted for JavaFX */
+
+/* Background with gradient */
+.root {
+    background: linear-gradient(to bottom right, #667eea, #764ba2);
+    background-color: #667eea; /* Fallback for standard CSS */
+    -fx-background-color: linear-gradient(to bottom right, #667eea, #764ba2);
+    -fx-alignment: center;
+}
+
+/* Main form container - Modern card design */
+.form_main {
+    min-width: 320px;
+    max-width: 320px;
+    -fx-min-width: 320px;
+    -fx-max-width: 320px;
+    background-color: white;
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 25, 0, 0, 8);
+    padding: 40px 30px 30px 30px;
+    -fx-padding: 40px 30px 30px 30px;
+    -fx-alignment: center;
+    -fx-spacing: 15px;
+}
+
+/* Title styling */
+.login-title {
+    font-size: 28px;
+    -fx-font-size: 28px;
+    font-weight: bold;
+    -fx-font-weight: bold;
+    color: #2e2e2e;
+    -fx-text-fill: #2e2e2e;
+    padding: 0 0 15px 0;
+    -fx-padding: 0 0 15 0;
+}
+
+/* Form styling */
+.login-form {
+    -fx-vgap: 20;
+    -fx-hgap: 10;
+    -fx-alignment: center;
+}
+
+/* Label styling */
+.login-label {
+    font-weight: 500;
+    -fx-font-weight: 500;
+    color: #2e2e2e;
+    -fx-text-fill: #2e2e2e;
+    font-size: 14px;
+    -fx-font-size: 14px;
+}
+
+/* Input field styling - Modern underline design */
+.login-input, .inputField {
+    background-color: transparent;
+    -fx-background-color: transparent;
+    border-color: transparent transparent #adadad transparent;
+    -fx-border-color: transparent transparent #adadad transparent;
+    border-width: 0 0 2px 0;
+    -fx-border-width: 0 0 2 0;
+    height: 35px;
+    -fx-pref-height: 35px;
+    font-size: 14px;
+    -fx-font-size: 14px;
+    font-weight: 500;
+    -fx-font-weight: 500;
+    color: black;
+    -fx-text-fill: black;
+    padding: 5px 0 5px 0;
+    -fx-padding: 5 0 5 0;
+    border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.login-input:focused, .inputField:focused {
+    border-color: transparent transparent rgb(199, 114, 255) transparent;
+    -fx-border-color: transparent transparent rgb(199, 114, 255) transparent;
+    border-width: 0 0 2px 0;
+    -fx-border-width: 0 0 2 0;
+    -fx-effect: null;
+}
+
+/* Button styling - Modern purple design */
+.login-button, #button {
+    background-color: rgb(162, 104, 255);
+    -fx-background-color: rgb(162, 104, 255);
+    color: white;
+    -fx-text-fill: white;
+    font-size: 14px;
+    -fx-font-size: 14px;
+    font-weight: 500;
+    -fx-font-weight: 500;
+    width: 200px;
+    height: 35px;
+    -fx-pref-width: 200px;
+    -fx-pref-height: 35px;
+    border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    cursor: pointer;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+}
+
+.login-button:hover, #button:hover {
+    background-color: rgb(126, 84, 255);
+    -fx-background-color: rgb(126, 84, 255);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 3);
+}
+
+/* Footer styling */
+.login-footer {
+    font-size: 12px;
+    -fx-font-size: 12px;
+    font-weight: 500;
+    -fx-font-weight: 500;
+    color: rgb(44, 24, 128);
+    -fx-text-fill: rgb(44, 24, 128);
+    padding: 8px 15px;
+    -fx-padding: 8px 15px;
+}
+
+/* Modern close button styling - Top right corner */
+.close-btn {
+    background-color: #9d1616d2;
+    -fx-background-color: #9d1616d2;
+    color: #ffffff;
+    -fx-text-fill: #ffffff;
+    font-size: 14px;
+    -fx-font-size: 14px;
+    font-weight: bold;
+    -fx-font-weight: bold;
+    border-color: transparent;
+    -fx-border-color: transparent;
+    border-radius: 50%;
+    -fx-border-radius: 50%;
+    -fx-background-radius: 50%;
+    width: 30px;
+    height: 30px;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    max-width: 30px;
+    max-height: 30px;
+    -fx-max-width: 30px;
+    -fx-max-height: 30px;
+    cursor: pointer;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0, 0, 1);
+}
+
+.close-btn:hover {
+    background-color: rgba(220, 53, 70, 0.329);
+    -fx-background-color: rgba(220, 53, 70, 0.43);
+    color: #dc3545;
+    -fx-text-fill: #dc3545;
+    -fx-effect: dropshadow(gaussian, rgba(220, 53, 70, 0.347), 5, 0, 0, 2);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.close-btn:pressed {
+    background-color: rgba(220, 53, 69, 0.25);
+    -fx-background-color: rgba(220, 53, 69, 0.25);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* Error states */
+.error-border {
+    border-color: transparent transparent #dc3545 transparent;
+    -fx-border-color: transparent transparent #dc3545 transparent;
+    border-width: 0 0 2px 0;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* Dialog styling */
+.dialog-pane {
+    font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+    -fx-font-size: 14px;
+    background-color: white;
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+}
+
+.dialog-pane .header-panel {
+    background-color: rgb(209, 193, 255);
+    -fx-background-color: rgb(209, 193, 255);
+    -fx-background-radius: 10px 10px 0 0;
+}
+
+.dialog-pane .button {
+    background-color: rgb(162, 104, 255);
+    -fx-background-color: rgb(162, 104, 255);
+    color: white;
+    -fx-text-fill: white;
+    font-weight: bold;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px;
+}

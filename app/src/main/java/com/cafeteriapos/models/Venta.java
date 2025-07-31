@@ -19,4 +19,6 @@ public class Venta {
     // Getters
     public String getId() { return id; }
     public double getTotal() { return total; }
+    public LocalDateTime getFecha() { return fecha; }
+    public List<Producto> getItems() { return items; }
 }

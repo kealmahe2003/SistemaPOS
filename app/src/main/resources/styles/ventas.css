@@ -1,16 +1,145 @@
-/* Estilo para la tabla */
-.table-view {
-    -fx-base: #f5f5f5;
-    -fx-font-size: 14px;
+/* Estilos generales */
+.root {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-base: #ecf0f1;
 }
 
-/* Estilo para botones principales */
-.button {
+/* Barra de herramientas */
+.toolbar {
+    -fx-background-color: #2c3e50;
+    background-color: #2c3e50;
+    -fx-padding: 10;
+    padding: 10;
+    -fx-spacing: 15;
+}
+
+.titulo-modulo {
+    -fx-font-size: 18px;
+    font-size: 18px;
     -fx-font-weight: bold;
-    -fx-padding: 8px 16px;
+    font-weight: bold;
+    -fx-text-fill: white;
 }
 
-/* Estilo para el total */
-#lblTotal {
-    -fx-text-fill: #2E7D32;
+.campo-busqueda {
+    -fx-pref-width: 300px;
+    -fx-prompt-text-fill: #95a5a6;
+}
+
+.boton-nuevo {
+    -fx-background-color: #3498db;
+    background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+/* Paneles divididos */
+.split-pane {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.split-pane-divider {
+    -fx-background-color: #bdc3c7;
+    background-color: #bdc3c7;
+    -fx-padding: 0 1 0 1;
+    padding: 0 1 0 1;
+}
+
+/* Tabla de productos */
+.tabla-productos {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #bdc3c7;
+    border-color: #bdc3c7;
+    -fx-border-width: 1;
+    border-width: 1;
+}
+
+.tabla-productos .column-header {
+    -fx-background-color: #3498db;
+    background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.tabla-productos .table-row-cell:filled:hover {
+    -fx-background-color: #e3f2fd;
+    background-color: #e3f2fd;
+}
+
+/* Lista del carrito */
+.lista-carrito {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #bdc3c7;
+    border-color: #bdc3c7;
+    -fx-border-width: 1;
+    border-width: 1;
+}
+
+/* Botones */
+.boton-agregar {
+    -fx-background-color: #2ecc71;
+    background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.boton-remover {
+    -fx-background-color: #e74c3c;
+    background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+.boton-finalizar {
+    -fx-background-color: #3498db;
+    background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+/* Total */
+.label-total-text {
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.label-total {
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #2ecc71;
+}
+
+/* Barra de estado */
+.status-bar {
+    -fx-background-color: #ecf0f1;
+    background-color: #ecf0f1;
+    -fx-border-color: #bdc3c7;
+    border-color: #bdc3c7;
+    -fx-border-width: 1 0 0 0;
+    border-width: 1 0 0 0;
+}
+
+.status-label {
+    -fx-font-style: italic;
+    font-style: italic;
+    -fx-text-fill: #7f8c8d;
+}
+
+/* Efectos hover */
+.button:hover {
+    -fx-opacity: 0.9;
+    opacity: 0.9;
+    -fx-border-color: darken(#bdc3c7, 10%);
+    border-color: darken(#bdc3c7, 10%);
 }

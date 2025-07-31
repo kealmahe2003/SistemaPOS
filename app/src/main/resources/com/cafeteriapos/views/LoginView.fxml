@@ -2,15 +2,53 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cafeteriapos.controllers.LoginController">
-    <padding>
-        <Insets top="50" right="50" bottom="50" left="50"/>
-    </padding>
-    <Label text="Sistema POS - Iniciar Sesión"/>
-    <TextField fx:id="userField" promptText="Usuario"/>
-    <PasswordField fx:id="passwordField" promptText="Contraseña"/>
-    <Button text="Iniciar Sesión" onAction="#handleLogin"/>
-</VBox>
+<StackPane xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.cafeteriapos.controllers.LoginController"
+           styleClass="root"
+           stylesheets="@/styles/login.css">
+
+    <!-- Main content centered -->
+    <VBox alignment="CENTER" spacing="0">
+        <!-- Main form container with modern design -->
+        <VBox styleClass="form_main" alignment="CENTER" spacing="20">
+            <!-- Title -->
+            <Label text="CAFETERÍA POS" styleClass="login-title"/>
+            
+            <!-- Form -->
+            <GridPane styleClass="login-form">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" minWidth="100"/>
+                    <ColumnConstraints minWidth="200"/>
+                </columnConstraints>
+                
+                <Label text="Usuario:" styleClass="login-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="userField" promptText="Ingrese su usuario" styleClass="login-input" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                
+                <Label text="Contraseña:" styleClass="login-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <PasswordField fx:id="passwordField" promptText="Ingrese su contraseña" styleClass="login-input" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            </GridPane>
+
+            <!-- Login Button -->
+            <Button text="Iniciar Sesión" onAction="#handleLogin" styleClass="login-button"/>
+
+            <!-- Footer -->
+            <Label text="Sistema POS v1.0" styleClass="login-footer"/>
+        </VBox>
+
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
+    </VBox>
+
+    <!-- Close button positioned in top-right corner -->
+    <Button text="X" onAction="#handleClose" styleClass="close-btn" StackPane.alignment="TOP_RIGHT">
+        <StackPane.margin>
+            <Insets top="15" right="15"/>
+        </StackPane.margin>
+    </Button>
+
+</StackPane>
