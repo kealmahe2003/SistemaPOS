@@ -78,6 +78,11 @@ public class LoginController {
         ((Stage) userField.getScene().getWindow()).close();
     }
 
+    @FXML
+    private void handleClose() {
+        cerrarVentanaActual();
+    }
+
     private void mostrarAlerta(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
