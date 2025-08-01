@@ -38,17 +38,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          # Usar configuración del archivo sonar-project.properties
+          # Solo especificar lo mínimo necesario
           args: >
-            -Dsonar.projectKey=kealmahe2003_SistemaPOS
-            -Dsonar.organization=kealmahe2003
-            -Dsonar.projectName=SistemaPOS
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.java.binaries=build/classes/java/main
-            -Dsonar.kotlin.binaries=build/classes/kotlin/main
-            -Dsonar.sources=src/main/java
-            -Dsonar.tests=src/test/java
-            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.java.source=17
-            -Dsonar.junit.reportPaths=build/test-results/test
-            -Dsonar.language=java
