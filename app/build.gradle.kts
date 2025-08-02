@@ -133,12 +133,35 @@ tasks.jacocoTestReport {
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "kealmahe2003-SistemaPOS")
+        property("sonar.projectKey", "kealmahe2003_SistemaPOS")
+        property("sonar.organization", "kealmahe2003")
         property("sonar.projectName", "SistemaPOS")
         property("sonar.java.coveragePlugin", "jacoco")
         property("sonar.coverage.jacoco.xmlReportPaths", 
             layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath)
+        property("sonar.junit.reportPaths", 
+            layout.buildDirectory.dir("test-results/test").get().asFile.absolutePath)
         property("sonar.sourceEncoding", "UTF-8")
+        
+        // Configuración específica para tests
+        property("sonar.tests", "src/test/java")
+        property("sonar.test.inclusions", "**/*Test.java,**/*Tests.java")
+        
+        // Exclusiones para archivos que no necesitan cobertura
+        property("sonar.coverage.exclusions", 
+            "**/Main.java," +
+            "**/Application.java," +
+            "**/*Controller.java," +
+            "**/views/**," +
+            "**/*.fxml," +
+            "**/*.css"
+        )
+        
+        // Configuración adicional para mejorar la detección
+        property("sonar.java.source", "21")
+        property("sonar.java.target", "21")
+        property("sonar.java.binaries", layout.buildDirectory.dir("classes/java/main").get().asFile.absolutePath)
+        property("sonar.java.test.binaries", layout.buildDirectory.dir("classes/java/test").get().asFile.absolutePath)
     }
 }
 
