@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cafeteriapos.controllers.DashboardController">
+   <children>
+      <Label text="Dashboard de Ventas" />
+      
+      <HBox spacing="20.0">
+         <children>
+            <VBox>
+               <children>
+                  <Label text="Ventas Hoy" />
+                  <Label fx:id="lblVentasHoy" text="0.00" />
+               </children>
+            </VBox>
+            
+            <VBox>
+               <children>
+                  <Label text="Producto Top" />
+                  <Label fx:id="lblProductoTop" text="Ninguno" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      
+      <HBox spacing="20.0">
+         <children>
+            <VBox>
+               <children>
+                  <Label text="Ventas por Dia" />
+                  <BarChart fx:id="chartVentasDiarias">
+                     <xAxis>
+                        <CategoryAxis fx:id="xAxisDias" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis fx:id="yAxisVentas" />
+                     </yAxis>
+                  </BarChart>
+               </children>
+            </VBox>
+            
+            <VBox>
+               <children>
+                  <Label text="Productos Top" />
+                  <PieChart fx:id="chartProductosTop" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      
+      <Button fx:id="btnActualizar" onAction="#actualizarDatos" text="Actualizar" />
+   </children>
+</VBox>

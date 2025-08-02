@@ -19,10 +19,10 @@
             <Label text="CAFETERÍA POS" styleClass="login-title"/>
             
             <!-- Form -->
-            <GridPane styleClass="login-form">
+            <GridPane styleClass="login-form" alignment="CENTER" hgap="10" vgap="10">
                 <columnConstraints>
-                    <ColumnConstraints halignment="RIGHT" minWidth="100"/>
-                    <ColumnConstraints minWidth="200"/>
+                    <ColumnConstraints halignment="LEFT" minWidth="80"/>
+                    <ColumnConstraints minWidth="180"/>
                 </columnConstraints>
                 
                 <Label text="Usuario:" styleClass="login-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -39,8 +39,9 @@
             <Label text="Sistema POS v1.0" styleClass="login-footer"/>
         </VBox>
 
+        <!-- Background image -->
         <padding>
-            <Insets top="40" right="40" bottom="40" left="40"/>
+            <Insets top="50" right="50" bottom="50" left="50"/>
         </padding>
     </VBox>
 

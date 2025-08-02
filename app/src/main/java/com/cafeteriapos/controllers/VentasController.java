@@ -11,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class VentasController {
+    private static final Logger logger = LoggerFactory.getLogger(VentasController.class);
 
     // Componentes UI
     @FXML private TableView<Producto> tablaProductos;
@@ -49,14 +52,14 @@ public class VentasController {
             
             // Si no hay productos, crear algunos en memoria sin guardar en Excel por ahora
             if (productos.isEmpty()) {
-                System.out.println("No se encontraron productos. Usando productos de ejemplo en memoria...");
+                logger.info("No se encontraron productos. Usando productos de ejemplo en memoria...");
                 return crearProductosDeEjemploEnMemoria();
             }
             
             return productos;
         } catch (Exception e) {
-            System.err.println("Error al cargar productos desde Excel: " + e.getMessage());
-            System.err.println("Usando productos de ejemplo en memoria...");
+            logger.error("Error al cargar productos desde Excel: {}", e.getMessage());
+            logger.info("Usando productos de ejemplo en memoria...");
             // Retornar productos de ejemplo en memoria si hay error
             return crearProductosDeEjemploEnMemoria();
         }
@@ -69,7 +72,7 @@ public class VentasController {
         productos.add(new Producto("Croissant", 1.75, 20));
         productos.add(new Producto("Muffin de Chocolate", 2.25, 15));
         productos.add(new Producto("Sandwich Mixto", 4.50, 10));
-        System.out.println("Productos de ejemplo cargados en memoria.");
+        logger.info("Productos de ejemplo cargados en memoria.");
         return productos;
     }
 
@@ -94,7 +97,7 @@ public class VentasController {
                 tablaProductos.getScene().getStylesheets().add(cssPath);
             }
         } catch (Exception e) {
-            System.err.println("No se pudo aplicar el CSS: " + e.getMessage());
+            logger.warn("No se pudo aplicar el CSS: {}", e.getMessage());
             // Continuar sin CSS, la funcionalidad no se ve afectada
         }
     }

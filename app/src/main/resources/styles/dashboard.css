@@ -1,0 +1,105 @@
+/* === ESTILOS DASHBOARD === */
+
+/* Título de sección */
+.titulo-seccion {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Container de métricas */
+.metricas-container {
+    -fx-alignment: CENTER;
+    -fx-spacing: 20;
+}
+
+/* Tarjetas de métricas */
+.metrica-card {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);
+    -fx-alignment: CENTER;
+    -fx-spacing: 8;
+    -fx-min-width: 180;
+}
+
+.metrica-titulo {
+    -fx-font-size: 14px;
+    -fx-text-fill: #7f8c8d;
+    -fx-font-weight: normal;
+}
+
+.metrica-valor {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #27ae60;
+}
+
+.metrica-detalle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #95a5a6;
+}
+
+/* Containers de gráficos */
+.grafico-container {
+    -fx-background-color: white;
+    -fx-padding: 15;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);
+    -fx-spacing: 10;
+}
+
+.grafico-titulo {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Controles del dashboard */
+.controles-container {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 15 20;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 1;
+}
+
+.ultima-actualizacion {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6c757d;
+    -fx-font-style: italic;
+}
+
+/* Estilos para gráficos JavaFX */
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-font-size: 12px;
+}
+
+/* Colores para barras del gráfico */
+.default-color0.chart-bar { -fx-bar-fill: #3498db; }
+.default-color1.chart-bar { -fx-bar-fill: #e74c3c; }
+.default-color2.chart-bar { -fx-bar-fill: #f39c12; }
+.default-color3.chart-bar { -fx-bar-fill: #27ae60; }
+.default-color4.chart-bar { -fx-bar-fill: #9b59b6; }
+
+/* Colores para sectores del PieChart */
+.default-color0.chart-pie { -fx-pie-color: #3498db; }
+.default-color1.chart-pie { -fx-pie-color: #e74c3c; }
+.default-color2.chart-pie { -fx-pie-color: #f39c12; }
+.default-color3.chart-pie { -fx-pie-color: #27ae60; }
+.default-color4.chart-pie { -fx-pie-color: #9b59b6; }

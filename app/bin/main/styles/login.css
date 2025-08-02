@@ -10,10 +10,10 @@
 
 /* Main form container - Modern card design */
 .form_main {
-    min-width: 320px;
-    max-width: 320px;
-    -fx-min-width: 320px;
-    -fx-max-width: 320px;
+    min-width: 380px;
+    max-width: 380px;
+    -fx-min-width: 380px;
+    -fx-max-width: 380px;
     background-color: white;
     -fx-background-color: white;
     -fx-background-radius: 15px;
