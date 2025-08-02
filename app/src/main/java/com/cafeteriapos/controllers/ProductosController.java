@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.util.List;
+
 public class ProductosController {
 
     // Componentes UI
@@ -28,6 +30,40 @@ public class ProductosController {
         configurarTabla();
         configurarSpinner();
         cargarProductos();
+    }
+
+    /**
+     * Método para recrear el archivo Excel en caso de corrupción extrema
+     */
+    @FXML
+    private void recrearArchivoExcel() {
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Recrear Archivo Excel");
+        confirmacion.setHeaderText("¿Recrear archivo Excel?");
+        confirmacion.setContentText(
+            "Esta acción creará un archivo Excel completamente nuevo.\n" +
+            "El archivo actual será respaldado.\n\n" +
+            "¿Desea continuar?");
+
+        confirmacion.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                if (ExcelManager.forzarRecreacionArchivo()) {
+                    mostrarAlerta("Éxito", 
+                        "Archivo Excel recreado exitosamente.\n" +
+                        "El archivo anterior fue respaldado.\n" +
+                        "Puede comenzar a agregar productos nuevamente.");
+                    
+                    // Limpiar la lista actual y recargar
+                    productos.clear();
+                    cargarProductos();
+                    limpiarFormulario();
+                } else {
+                    mostrarError("Error", 
+                        "No se pudo recrear el archivo Excel.\n" +
+                        "Verifique los permisos del directorio.");
+                }
+            }
+        });
     }
 
     private void configurarValidaciones() {
@@ -60,7 +96,27 @@ public class ProductosController {
     }
 
     private void cargarProductos() {
-        productos.setAll(ExcelManager.leerProductos());
+        try {
+            List<Producto> productosLeidos = ExcelManager.leerProductos();
+            productos.setAll(productosLeidos);
+            
+            if (productosLeidos.isEmpty()) {
+                mostrarAlerta("Información", 
+                    "No se encontraron productos en el archivo.\n" +
+                    "Puede comenzar agregando nuevos productos.");
+            } else {
+                System.out.println("Productos cargados: " + productosLeidos.size());
+            }
+            
+        } catch (Exception e) {
+            mostrarError("Error al cargar productos", 
+                "Error al cargar productos: " + e.getMessage() + "\n" +
+                "La aplicación continuará con una lista vacía.\n" +
+                "Puede agregar nuevos productos normalmente.");
+            
+            // Asegurar que la lista esté inicializada aunque haya error
+            productos.clear();
+        }
     }
 
     @FXML
@@ -112,6 +168,7 @@ public class ProductosController {
         }
     }
 
+    @FXML
     private void eliminarProducto() {
         Producto seleccionado = tablaProductos.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
@@ -119,12 +176,21 @@ public class ProductosController {
             confirmacion.setTitle("Confirmar eliminación");
             confirmacion.setHeaderText(null);
             confirmacion.setContentText(
-                "¿Eliminar el producto: " + seleccionado.getNombre() + "?");
+                "¿Está seguro de que desea eliminar el producto: " + seleccionado.getNombre() + "?\n\n" +
+                "Esta acción no se puede deshacer.");
 
             confirmacion.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    productos.remove(seleccionado);
-                    ExcelManager.eliminarProducto(seleccionado);
+                    try {
+                        productos.remove(seleccionado);
+                        ExcelManager.eliminarProducto(seleccionado);
+                        mostrarAlerta("Éxito", "Producto eliminado correctamente");
+                        limpiarFormulario();
+                    } catch (Exception e) {
+                        mostrarError("Error", "No se pudo eliminar el producto: " + e.getMessage());
+                        // Revertir el cambio en la lista local
+                        productos.add(seleccionado);
+                    }
                 }
             });
         } else {
@@ -145,17 +211,25 @@ public class ProductosController {
         Producto seleccionado = tablaProductos.getSelectionModel().getSelectedItem();
         if (seleccionado != null) {
             try {
+                validarFormulario(); // Validar antes de actualizar
+                
                 seleccionado.setNombre(tfNombre.getText().trim());
                 seleccionado.setPrecio(Double.parseDouble(tfPrecio.getText()));
                 seleccionado.setStock(spinnerStock.getValue());
                 
                 tablaProductos.refresh();
-                ExcelManager.guardarProducto(seleccionado);
+                ExcelManager.actualizarProducto(seleccionado); // Usar método actualizar
                 limpiarFormulario();
                 
+                mostrarAlerta("Éxito", "Producto actualizado correctamente");
+                
             } catch (NumberFormatException e) {
-                mostrarAlerta("Error", "El precio debe ser un número válido");
+                mostrarError("Error", "El precio debe ser un número válido");
+            } catch (Exception e) {
+                mostrarError("Error", "Error al actualizar producto: " + e.getMessage());
             }
+        } else {
+            mostrarError("Error", "Seleccione un producto para actualizar");
         }
     }
 

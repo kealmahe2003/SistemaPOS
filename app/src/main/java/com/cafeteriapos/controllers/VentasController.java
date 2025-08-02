@@ -30,6 +30,8 @@ public class VentasController {
     @FXML private TableColumn<ItemCarrito, Double> colCarritoSubtotal;
     @FXML private Label lblTotal;
     @FXML private TextField tfBusqueda;
+    @FXML private Spinner<Integer> spinnerCantidad;
+    @FXML private Spinner<Integer> spinnerEliminar;
 
     // Datos
     private final ObservableList<ItemCarrito> carrito = FXCollections.observableArrayList();
@@ -75,6 +77,7 @@ public class VentasController {
     public void initialize() {
         configurarTablaProductos();
         configurarTablaCarrito();
+        configurarSpinners();
         cargarProductos();
         configurarBusqueda();
         aplicarEstilosCSS();
@@ -111,6 +114,29 @@ public class VentasController {
         tablaCarrito.setItems(carrito);
     }
 
+    private void configurarSpinners() {
+        // Configurar spinner para agregar productos
+        SpinnerValueFactory<Integer> valueFactoryAgregar = 
+            new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1);
+        spinnerCantidad.setValueFactory(valueFactoryAgregar);
+        spinnerCantidad.setEditable(true);
+
+        // Configurar spinner para eliminar productos
+        SpinnerValueFactory<Integer> valueFactoryEliminar = 
+            new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1);
+        spinnerEliminar.setValueFactory(valueFactoryEliminar);
+        spinnerEliminar.setEditable(true);
+
+        // Actualizar el máximo del spinner de eliminar cuando se selecciona un item del carrito
+        tablaCarrito.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                SpinnerValueFactory<Integer> factory = 
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(1, newVal.getCantidad(), 1);
+                spinnerEliminar.setValueFactory(factory);
+            }
+        });
+    }
+
     private void cargarProductos() {
         productosDisponibles.setAll(ExcelManager.leerProductos());
     }
@@ -133,38 +159,72 @@ public class VentasController {
             return;
         }
 
-        if (seleccionado.getStock() <= 0) {
-            mostrarAlerta("Sin stock", "No hay suficiente stock de este producto");
+        int cantidadDeseada = spinnerCantidad.getValue();
+        
+        if (seleccionado.getStock() < cantidadDeseada) {
+            mostrarAlerta("Sin stock", String.format(
+                "No hay suficiente stock. Disponible: %d, Solicitado: %d", 
+                seleccionado.getStock(), cantidadDeseada));
             return;
         }
 
         // Buscar si ya existe en carrito
         ItemCarrito itemExistente = carrito.stream()
-            .filter(item -> item.getProducto().equals(seleccionado))
+            .filter(item -> item.getProducto().getNombre().equals(seleccionado.getNombre()))
             .findFirst()
             .orElse(null);
 
         if (itemExistente != null) {
-            itemExistente.setCantidad(itemExistente.getCantidad() + 1);
+            int nuevaCantidad = itemExistente.getCantidad() + cantidadDeseada;
+            if (seleccionado.getStock() < nuevaCantidad) {
+                mostrarAlerta("Sin stock", String.format(
+                    "No hay suficiente stock. Ya tienes %d en el carrito, stock disponible: %d", 
+                    itemExistente.getCantidad(), seleccionado.getStock()));
+                return;
+            }
+            itemExistente.setCantidad(nuevaCantidad);
         } else {
-            carrito.add(new ItemCarrito(seleccionado, 1));
+            carrito.add(new ItemCarrito(seleccionado, cantidadDeseada));
         }
 
+        // Resetear spinner
+        spinnerCantidad.getValueFactory().setValue(1);
+        
         actualizarTotal();
         tablaCarrito.refresh();
+        
+        mostrarAlerta("Éxito", String.format("Se agregaron %d unidades de %s al carrito", 
+            cantidadDeseada, seleccionado.getNombre()));
     }
 
     @FXML
     private void removerDelCarrito() {
         ItemCarrito seleccionado = tablaCarrito.getSelectionModel().getSelectedItem();
-        if (seleccionado != null) {
-            if (seleccionado.getCantidad() > 1) {
-                seleccionado.setCantidad(seleccionado.getCantidad() - 1);
-            } else {
-                carrito.remove(seleccionado);
-            }
-            actualizarTotal();
+        
+        if (seleccionado == null) {
+            mostrarAlerta("Error", "Seleccione un item del carrito primero");
+            return;
         }
+
+        int cantidadAEliminar = spinnerEliminar.getValue();
+        
+        if (cantidadAEliminar >= seleccionado.getCantidad()) {
+            // Eliminar completamente el item
+            carrito.remove(seleccionado);
+            mostrarAlerta("Éxito", String.format("Se eliminó %s del carrito completamente", 
+                seleccionado.getNombreProducto()));
+        } else {
+            // Reducir la cantidad
+            seleccionado.setCantidad(seleccionado.getCantidad() - cantidadAEliminar);
+            mostrarAlerta("Éxito", String.format("Se eliminaron %d unidades de %s del carrito", 
+                cantidadAEliminar, seleccionado.getNombreProducto()));
+        }
+        
+        // Resetear spinner
+        spinnerEliminar.getValueFactory().setValue(1);
+        
+        actualizarTotal();
+        tablaCarrito.refresh();
     }
 
     @FXML
@@ -190,15 +250,19 @@ public class VentasController {
     }
 
     private Venta crearVenta() {
-        ObservableList<ItemCarrito> itemsCopiados = FXCollections.observableArrayList();
-        carrito.forEach(item -> itemsCopiados.add(new ItemCarrito(item.getProducto(), item.getCantidad())));
-        
-        // Convertir los items del carrito a una lista de productos o el tipo que espera Venta
-        // Suponiendo que Venta espera List<Producto>:
+        // Crear una lista de productos que representen los items vendidos
+        // En esta lista, el "stock" del producto representa la cantidad vendida
         ObservableList<Producto> productosVenta = FXCollections.observableArrayList();
-        itemsCopiados.forEach(item -> {
-            Producto producto = new Producto(item.getProducto().getNombre(), item.getProducto().getPrecio(), item.getCantidad());
-            productosVenta.add(producto);
+        
+        carrito.forEach(item -> {
+            // Crear un producto donde el "stock" representa la cantidad vendida
+            // Esto es solo para el registro de la venta, no afecta el inventario real
+            Producto productoVenta = new Producto(
+                item.getProducto().getNombre(), 
+                item.getProducto().getPrecio(), 
+                item.getCantidad() // La cantidad vendida se guarda como "stock" en el registro de venta
+            );
+            productosVenta.add(productoVenta);
         });
 
         return new Venta(
@@ -211,13 +275,25 @@ public class VentasController {
 
     private void registrarVenta(Venta venta) {
         try {
-            // Actualizar stocks
-            venta.getItems().forEach(item -> {
-                Producto p = item;
-                p.setStock(p.getStock() - item.getStock()); // Subtract the quantity sold from the stock
-                ExcelManager.guardarProducto(p);
+            // Actualizar stocks de los productos originales en la lista
+            carrito.forEach(itemCarrito -> {
+                // Buscar el producto original en la lista de productos disponibles
+                Producto productoOriginal = productosDisponibles.stream()
+                    .filter(p -> p.getNombre().equals(itemCarrito.getProducto().getNombre()))
+                    .findFirst()
+                    .orElse(null);
+                
+                if (productoOriginal != null) {
+                    // Actualizar el stock del producto original
+                    int nuevoStock = productoOriginal.getStock() - itemCarrito.getCantidad();
+                    productoOriginal.setStock(Math.max(0, nuevoStock)); // Asegurar que no sea negativo
+                    
+                    // Guardar el producto actualizado en Excel
+                    ExcelManager.actualizarProducto(productoOriginal);
+                }
             });
 
+            // Guardar la venta
             ExcelManager.guardarVenta(venta);
             CajaManager.registrarVenta(venta.getId(), venta.getTotal());
             
@@ -226,7 +302,9 @@ public class VentasController {
                 venta.getId(), venta.getTotal()));
                 
             limpiarCarrito();
-            cargarProductos(); // Refrescar datos
+            
+            // Refrescar la tabla para mostrar los nuevos stocks
+            tablaProductos.refresh();
 
         } catch (Exception e) {
             mostrarAlerta("Error", "No se pudo registrar: " + e.getMessage());
