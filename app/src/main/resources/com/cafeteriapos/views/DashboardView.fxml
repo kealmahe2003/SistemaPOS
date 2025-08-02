@@ -4,54 +4,186 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cafeteriapos.controllers.DashboardController">
-   <children>
-      <Label text="Dashboard de Ventas" />
-      
-      <HBox spacing="20.0">
-         <children>
-            <VBox>
-               <children>
-                  <Label text="Ventas Hoy" />
-                  <Label fx:id="lblVentasHoy" text="0.00" />
-               </children>
-            </VBox>
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cafeteriapos.controllers.DashboardController" styleClass="dashboard-scroll" fitToWidth="true">
+   <content>
+      <VBox styleClass="dashboard-container" spacing="30.0">
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+         
+         <!-- Título Principal -->
+         <VBox styleClass="title-section" spacing="5.0">
+            <Label text="Dashboard Analytics" styleClass="main-title" />
+            <Label text="Monitoreo en tiempo real de tu negocio" styleClass="subtitle" />
+         </VBox>
+         
+         <!-- Grid de Tarjetas de Métricas -->
+         <GridPane styleClass="metrics-grid" hgap="25.0" vgap="25.0">
+            <columnConstraints>
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="300.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="300.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="300.0" />
+            </columnConstraints>
             
-            <VBox>
-               <children>
-                  <Label text="Producto Top" />
-                  <Label fx:id="lblProductoTop" text="Ninguno" />
-               </children>
-            </VBox>
-         </children>
-      </HBox>
-      
-      <HBox spacing="20.0">
-         <children>
-            <VBox>
-               <children>
-                  <Label text="Ventas por Dia" />
-                  <BarChart fx:id="chartVentasDiarias">
+            <!-- Tarjeta Balance Mensual -->
+            <StackPane styleClass="metric-card-modern" GridPane.columnIndex="0" GridPane.rowIndex="0">
+               <!-- Efecto de fondo con blur -->
+               <Circle styleClass="card-glow-effect" radius="80.0" />
+               
+               <VBox styleClass="card-content" spacing="20.0">
+                  <padding>
+                     <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+                  </padding>
+                  
+                  <!-- Header de la tarjeta -->
+                  <HBox styleClass="card-header">
+                     <StackPane styleClass="icon-container">
+                        <Circle styleClass="icon-background" radius="18.0" />
+                        <Label text="📊" styleClass="card-icon" />
+                     </StackPane>
+                     <VBox styleClass="header-text" spacing="2.0">
+                        <Label text="Balance Mensual" styleClass="card-title" />
+                        <Label text="Actualizado ahora" styleClass="card-subtitle" />
+                     </VBox>
+                  </HBox>
+                  
+                  <!-- Contenido principal -->
+                  <HBox styleClass="card-stats" spacing="30.0">
+                     <VBox styleClass="stat-section" spacing="5.0">
+                        <Label text="Ingresos" styleClass="stat-label" />
+                        <Label fx:id="lblIngresosHoy" text="0.00" styleClass="stat-value" />
+                     </VBox>
+                     <Rectangle styleClass="stat-divider" width="1.0" height="60.0" />
+                     <VBox styleClass="stat-section" spacing="5.0">
+                        <Label text="Costos" styleClass="stat-label" />
+                        <Label fx:id="lblCostosHoy" text="0.00" styleClass="stat-value" />
+                     </VBox>
+                  </HBox>
+                  
+                  <!-- Información adicional en lugar del mini gráfico -->
+                  <VBox styleClass="balance-info" spacing="8.0">
+                     <Label text="Balance positivo del mes" styleClass="balance-status" />
+                     <Label text="Crecimiento sostenido" styleClass="balance-trend" />
+                  </VBox>
+                  
+                  <!-- Botón de acción -->
+                  <Button text="Ver Reporte Completo" styleClass="card-action-button" />
+               </VBox>
+            </StackPane>
+            
+            <!-- Tarjeta Ventas del Día -->
+            <StackPane styleClass="metric-card-modern card-ventas" GridPane.columnIndex="1" GridPane.rowIndex="0">
+               <Circle styleClass="card-glow-effect-green" radius="80.0" />
+               
+               <VBox styleClass="card-content" spacing="20.0">
+                  <padding>
+                     <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+                  </padding>
+                  
+                  <HBox styleClass="card-header">
+                     <StackPane styleClass="icon-container-green">
+                        <Circle styleClass="icon-background-green" radius="18.0" />
+                        <Label text="💰" styleClass="card-icon" />
+                     </StackPane>
+                     <VBox styleClass="header-text" spacing="2.0">
+                        <Label text="Ventas Hoy" styleClass="card-title" />
+                        <Label text="Tiempo real" styleClass="card-subtitle" />
+                     </VBox>
+                  </HBox>
+                  
+                  <VBox styleClass="single-stat" spacing="8.0">
+                     <Label fx:id="lblVentasHoy" text="0.00" styleClass="main-stat-value" />
+                     <HBox styleClass="stat-details" spacing="10.0">
+                        <Label fx:id="lblTransaccionesHoy" text="0 transacciones" styleClass="stat-detail" />
+                        <Label fx:id="lblPromedioVenta" text="Promedio: 0" styleClass="stat-detail" />
+                     </HBox>
+                  </VBox>
+                  
+                  <Button text="Ver Detalle de Ventas" styleClass="card-action-button-green" />
+               </VBox>
+            </StackPane>
+            
+            <!-- Tarjeta Producto Top -->
+            <StackPane styleClass="metric-card-modern card-producto" GridPane.columnIndex="2" GridPane.rowIndex="0">
+               <Circle styleClass="card-glow-effect-blue" radius="80.0" />
+               
+               <VBox styleClass="card-content" spacing="20.0">
+                  <padding>
+                     <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+                  </padding>
+                  
+                  <HBox styleClass="card-header">
+                     <StackPane styleClass="icon-container-blue">
+                        <Circle styleClass="icon-background-blue" radius="18.0" />
+                        <Label text="⭐" styleClass="card-icon" />
+                     </StackPane>
+                     <VBox styleClass="header-text" spacing="2.0">
+                        <Label text="Producto Estrella" styleClass="card-title" />
+                        <Label text="Más vendido" styleClass="card-subtitle" />
+                     </VBox>
+                  </HBox>
+                  
+                  <VBox styleClass="product-info" spacing="10.0">
+                     <Label fx:id="lblProductoTop" text="Ninguno" styleClass="product-name" />
+                     <HBox styleClass="product-stats" spacing="15.0">
+                        <VBox spacing="2.0">
+                           <Label text="Vendidos" styleClass="stat-label-small" />
+                           <Label fx:id="lblCantidadTop" text="0" styleClass="stat-value-small" />
+                        </VBox>
+                        <VBox spacing="2.0">
+                           <Label text="Ingresos" styleClass="stat-label-small" />
+                           <Label fx:id="lblIngresosTop" text="0" styleClass="stat-value-small" />
+                        </VBox>
+                     </HBox>
+                  </VBox>
+                  
+                  <Button text="Gestionar Productos" styleClass="card-action-button-blue" />
+               </VBox>
+            </StackPane>
+         </GridPane>
+         
+         <!-- Sección de Gráficos -->
+         <VBox styleClass="charts-section" spacing="25.0">
+            <Label text="Análisis Visual" styleClass="section-title" />
+            
+            <HBox styleClass="charts-container" spacing="30.0">
+               <!-- Gráfico de Ventas Diarias -->
+               <VBox styleClass="chart-card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+                  </padding>
+                  
+                  <Label text="Ventas por Día (7 días)" styleClass="chart-title" />
+                  <BarChart fx:id="chartVentasDiarias" styleClass="modern-bar-chart" animated="true">
                      <xAxis>
-                        <CategoryAxis fx:id="xAxisDias" />
+                        <CategoryAxis fx:id="xAxisDias" styleClass="chart-axis" />
                      </xAxis>
                      <yAxis>
-                        <NumberAxis fx:id="yAxisVentas" />
+                        <NumberAxis fx:id="yAxisVentas" styleClass="chart-axis" />
                      </yAxis>
                   </BarChart>
-               </children>
-            </VBox>
-            
-            <VBox>
-               <children>
-                  <Label text="Productos Top" />
-                  <PieChart fx:id="chartProductosTop" />
-               </children>
-            </VBox>
-         </children>
-      </HBox>
-      
-      <Button fx:id="btnActualizar" onAction="#actualizarDatos" text="Actualizar" />
-   </children>
-</VBox>
+               </VBox>
+               
+               <!-- Gráfico de Productos Top -->
+               <VBox styleClass="chart-card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+                  </padding>
+                  
+                  <Label text="Top Productos Vendidos" styleClass="chart-title" />
+                  <PieChart fx:id="chartProductosTop" styleClass="modern-pie-chart" animated="true" />
+               </VBox>
+            </HBox>
+         </VBox>
+         
+         <!-- Botón de Actualización -->
+         <HBox styleClass="action-section" spacing="15.0">
+            <Button fx:id="btnActualizar" onAction="#actualizarDatos" text="🔄 Actualizar Datos" styleClass="refresh-button" />
+            <Button text="📊 Exportar Reporte" styleClass="export-button" />
+            <Button text="⚙️ Configurar Dashboard" styleClass="config-button" />
+         </HBox>
+      </VBox>
+   </content>
+</ScrollPane>

@@ -7,50 +7,46 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.ComboBox;
+import javafx.scene.chart.*;
 import javafx.scene.control.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Controlador para la vista del Dashboard con estadísticas de ventas
- * Maneja gráficos, métricas y análisis de datos de ventas
+ * Controlador para el Dashboard moderno con estadísticas avanzadas
+ * Maneja gráficos, métricas y análisis de datos de ventas con diseño moderno
  */
 public class DashboardController implements Initializable {
     
     private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
     
-    // === FXML COMPONENTS ===
+    // === NUEVOS CAMPOS DEL DASHBOARD MODERNO ===
     
-    // Métricas
+    // Tarjeta Ventas del Día
     @FXML private Label lblVentasHoy;
-    // @FXML private Label lblCantidadVentasHoy; // No existe en FXML actual
-    @FXML private Label lblProductoTop;
-    // @FXML private Label lblVentasProductoTop; // No existe en FXML actual
-    // @FXML private Label lblTotalMensual; // No existe en FXML actual
-    // @FXML private Label lblPromedioMensual; // No existe en FXML actual
-    // @FXML private Label lblUltimaActualizacion; // No existe en FXML actual
+    @FXML private Label lblTransaccionesHoy;
+    @FXML private Label lblPromedioVenta;
     
-    // Gráficos
+    // Tarjeta Producto Estrella
+    @FXML private Label lblProductoTop;
+    @FXML private Label lblCantidadTop;
+    @FXML private Label lblIngresosTop;
+    
+    // Tarjeta Balance Mensual - Simplificada
+    @FXML private Label lblIngresosHoy;
+    @FXML private Label lblCostosHoy;
+    
+    // Gráficos principales
     @FXML private BarChart<String, Number> chartVentasDiarias;
     @FXML private CategoryAxis xAxisDias;
     @FXML private NumberAxis yAxisVentas;
     @FXML private PieChart chartProductosTop;
-    
-    // Controles
-    @FXML private ComboBox<String> comboPeriodo;
     
     // === DATA STORAGE ===
     private List<Venta> ventasData;
@@ -58,7 +54,7 @@ public class DashboardController implements Initializable {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        logger.info("Inicializando Dashboard Controller");
+        logger.info("Inicializando Dashboard Controller Moderno");
         
         // Configurar gráficos
         configurarGraficos();
@@ -69,34 +65,42 @@ public class DashboardController implements Initializable {
         // Actualizar vista
         actualizarDatos();
         
-        logger.info("Dashboard Controller inicializado exitosamente");
+        logger.info("Dashboard Controller Moderno inicializado exitosamente");
     }
     
     /**
      * Configura las propiedades básicas de los gráficos
      */
     private void configurarGraficos() {
-        // Configurar BarChart
-        yAxisVentas.setLabel("Ingresos ($)");
-        xAxisDias.setLabel("Días");
-        chartVentasDiarias.setTitle("Ventas Diarias");
-        chartVentasDiarias.setLegendVisible(false);
+        // Configurar BarChart principal
+        if (yAxisVentas != null) {
+            yAxisVentas.setLabel("Ingresos ($)");
+        }
+        if (xAxisDias != null) {
+            xAxisDias.setLabel("Días");
+        }
+        if (chartVentasDiarias != null) {
+            chartVentasDiarias.setLegendVisible(false);
+            chartVentasDiarias.setAnimated(true);
+        }
         
         // Configurar PieChart
-        chartProductosTop.setTitle("Productos Más Vendidos");
-        chartProductosTop.setLegendVisible(true);
+        if (chartProductosTop != null) {
+            chartProductosTop.setLegendVisible(true);
+            chartProductosTop.setAnimated(true);
+        }
         
         logger.debug("Gráficos configurados correctamente");
     }
     
     /**
-     * Carga los datos desde Excel Manager
+     * Carga los datos reales desde Excel Manager
      */
     private void cargarDatos() {
         try {
-            logger.info("Cargando datos para dashboard...");
+            logger.info("Cargando datos reales para dashboard...");
             
-            // Cargar productos
+            // Cargar productos reales
             productosData = ExcelManager.leerProductos();
             logger.debug("Productos cargados: {}", productosData.size());
             
@@ -104,43 +108,15 @@ public class DashboardController implements Initializable {
             ventasData = ExcelManager.leerVentas();
             logger.debug("Ventas cargadas: {}", ventasData.size());
             
-            // Si no hay ventas, simular algunas para demostración
-            if (ventasData.isEmpty()) {
-                logger.info("No hay ventas reales, generando datos de ejemplo...");
-                ventasData = cargarVentasSimuladas();
-            }
-            
+            logger.info("Datos reales cargados exitosamente: {} productos, {} ventas", 
+                productosData.size(), ventasData.size());
+                
         } catch (Exception e) {
-            logger.error("Error cargando datos para dashboard: {}", e.getMessage());
+            logger.error("Error cargando datos reales: {}", e.getMessage());
             // Inicializar listas vacías para evitar errores
             productosData = new ArrayList<>();
             ventasData = new ArrayList<>();
         }
-    }
-    
-    /**
-     * Método para generar datos de ventas de ejemplo cuando no hay ventas reales
-     * Usado solo para demostración cuando el Excel no tiene ventas registradas
-     */
-    private List<Venta> cargarVentasSimuladas() {
-        List<Venta> ventas = new ArrayList<>();
-        LocalDate hoy = LocalDate.now();
-        
-        // Simular 7 días de ventas
-        for (int i = 0; i < 7; i++) {
-            LocalDate fecha = hoy.minusDays(i);
-            
-            // Simular 2-5 ventas por día
-            int ventasPorDia = 2 + (int)(Math.random() * 4);
-            for (int j = 0; j < ventasPorDia; j++) {
-                Venta venta = new Venta();
-                venta.setFecha(fecha);
-                venta.setTotal(20.0 + (Math.random() * 80.0)); // $20-100
-                ventas.add(venta);
-            }
-        }
-        
-        return ventas;
     }
     
     /**
@@ -154,16 +130,12 @@ public class DashboardController implements Initializable {
             // Recargar datos
             cargarDatos();
             
-            // Actualizar métricas
-            actualizarMetricas();
+            // Actualizar métricas modernas
+            actualizarMetricasModernas();
             
             // Actualizar gráficos
             actualizarGraficoVentasDiarias();
             actualizarGraficoProductosTop();
-            
-            // Actualizar timestamp
-            // lblUltimaActualizacion.setText("Ultima actualizacion: " + 
-            //     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
             
             logger.info("Dashboard actualizado exitosamente");
             
@@ -173,12 +145,12 @@ public class DashboardController implements Initializable {
     }
     
     /**
-     * Actualiza las métricas numéricas del dashboard
+     * Actualiza las métricas del dashboard moderno
      */
-    private void actualizarMetricas() {
+    private void actualizarMetricasModernas() {
         LocalDate hoy = LocalDate.now();
         
-        // Ventas de hoy
+        // === TARJETA VENTAS DEL DÍA ===
         List<Venta> ventasHoy = ventasData.stream()
             .filter(v -> v.getFecha().equals(hoy))
             .collect(Collectors.toList());
@@ -187,38 +159,100 @@ public class DashboardController implements Initializable {
             .mapToDouble(Venta::getTotal)
             .sum();
         
-        lblVentasHoy.setText(String.format("$%.2f", totalHoy));
-        // lblCantidadVentasHoy.setText(ventasHoy.size() + " transacciones");
+        double promedioVenta = ventasHoy.isEmpty() ? 0 : totalHoy / ventasHoy.size();
         
-        // Producto más vendido (simulado por ahora)
-        if (!productosData.isEmpty()) {
-            Producto productoTop = productosData.get(0);
-            lblProductoTop.setText(productoTop.getNombre());
-            // lblVentasProductoTop.setText("5 vendidos"); // Simulado
+        if (lblVentasHoy != null) {
+            lblVentasHoy.setText(String.format("$%.2f", totalHoy));
+        }
+        if (lblTransaccionesHoy != null) {
+            lblTransaccionesHoy.setText(ventasHoy.size() + " transacciones");
+        }
+        if (lblPromedioVenta != null) {
+            lblPromedioVenta.setText(String.format("Promedio: $%.0f", promedioVenta));
         }
         
-        // Total mensual
-        LocalDate inicioMes = hoy.withDayOfMonth(1);
-        List<Venta> ventasMes = ventasData.stream()
-            .filter(v -> !v.getFecha().isBefore(inicioMes))
-            .collect(Collectors.toList());
+        // === TARJETA PRODUCTO ESTRELLA ===
+        if (!productosData.isEmpty() && !ventasData.isEmpty()) {
+            // Calcular el producto más vendido basado en datos reales
+            Map<String, Integer> ventasPorProducto = new HashMap<>();
+            Map<String, Double> ingresosPorProducto = new HashMap<>();
+            
+            // Procesar ventas reales para encontrar el producto más vendido
+            for (Venta venta : ventasData) {
+                if (venta.getItems() != null) {
+                    for (Producto prod : venta.getItems()) {
+                        String nombre = prod.getNombre();
+                        ventasPorProducto.put(nombre, 
+                            ventasPorProducto.getOrDefault(nombre, 0) + 1);
+                        ingresosPorProducto.put(nombre,
+                            ingresosPorProducto.getOrDefault(nombre, 0.0) + prod.getPrecio());
+                    }
+                }
+            }
+            
+            if (!ventasPorProducto.isEmpty()) {
+                // Encontrar el producto con más ventas
+                Optional<Map.Entry<String, Integer>> productoTopEntry = ventasPorProducto.entrySet().stream()
+                    .max(Map.Entry.comparingByValue());
+                
+                if (productoTopEntry.isPresent()) {
+                    String productoTopNombre = productoTopEntry.get().getKey();
+                    int cantidadVendida = ventasPorProducto.get(productoTopNombre);
+                    double ingresosProducto = ingresosPorProducto.get(productoTopNombre);
+                    
+                    if (lblProductoTop != null) {
+                        lblProductoTop.setText(productoTopNombre);
+                    }
+                    if (lblCantidadTop != null) {
+                        lblCantidadTop.setText(String.valueOf(cantidadVendida));
+                    }
+                    if (lblIngresosTop != null) {
+                        lblIngresosTop.setText(String.format("$%.0f", ingresosProducto));
+                    }
+                } else {
+                    // Sin datos válidos
+                    if (lblProductoTop != null) lblProductoTop.setText("Sin datos");
+                    if (lblCantidadTop != null) lblCantidadTop.setText("0");
+                    if (lblIngresosTop != null) lblIngresosTop.setText("$0");
+                }
+            } else {
+                // Sin datos de ventas con productos
+                if (lblProductoTop != null) lblProductoTop.setText("Sin ventas");
+                if (lblCantidadTop != null) lblCantidadTop.setText("0");
+                if (lblIngresosTop != null) lblIngresosTop.setText("$0");
+            }
+        } else {
+            // Valores por defecto cuando no hay datos
+            if (lblProductoTop != null) lblProductoTop.setText("Sin productos");
+            if (lblCantidadTop != null) lblCantidadTop.setText("0");
+            if (lblIngresosTop != null) lblIngresosTop.setText("$0");
+        }
         
-        double totalMes = ventasMes.stream()
+        // === TARJETA BALANCE MENSUAL ===
+        double ingresosMensuales = ventasData.stream()
+            .filter(v -> v.getFecha().getMonthValue() == hoy.getMonthValue())
             .mapToDouble(Venta::getTotal)
             .sum();
         
-        double promedioMes = ventasMes.isEmpty() ? 0 : totalMes / hoy.getDayOfMonth();
+        // Simular costos (25% de los ingresos)
+        double costosMensuales = ingresosMensuales * 0.25;
         
-        // lblTotalMensual.setText(String.format("$%.2f", totalMes));
-        // lblPromedioMensual.setText(String.format("Promedio: $%.2f/día", promedioMes));
+        if (lblIngresosHoy != null) {
+            lblIngresosHoy.setText(String.format("$%.0f", ingresosMensuales));
+        }
+        if (lblCostosHoy != null) {
+            lblCostosHoy.setText(String.format("$%.0f", costosMensuales));
+        }
         
-        logger.debug("Métricas actualizadas: Hoy=${}, Mes=${}", totalHoy, totalMes);
+        logger.debug("Métricas modernas actualizadas: Hoy=${}", totalHoy);
     }
     
     /**
      * Actualiza el gráfico de barras de ventas diarias
      */
     private void actualizarGraficoVentasDiarias() {
+        if (chartVentasDiarias == null) return;
+        
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Ventas Diarias");
         
@@ -251,18 +285,35 @@ public class DashboardController implements Initializable {
      * Actualiza el gráfico circular de productos más vendidos
      */
     private void actualizarGraficoProductosTop() {
+        if (chartProductosTop == null) return;
+        
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         
-        // Por ahora simulamos datos de productos más vendidos
-        if (!productosData.isEmpty()) {
-            for (int i = 0; i < Math.min(5, productosData.size()); i++) {
-                Producto producto = productosData.get(i);
-                // Simular ventas (en producción será calculado desde datos reales)
-                double ventas = 10 + (Math.random() * 20);
-                pieChartData.add(new PieChart.Data(producto.getNombre(), ventas));
+        if (!productosData.isEmpty() && !ventasData.isEmpty()) {
+            // Calcular ventas reales por producto
+            Map<String, Integer> ventasPorProducto = new HashMap<>();
+            
+            for (Venta venta : ventasData) {
+                if (venta.getItems() != null) {
+                    for (Producto prod : venta.getItems()) {
+                        String nombre = prod.getNombre();
+                        ventasPorProducto.put(nombre, 
+                            ventasPorProducto.getOrDefault(nombre, 0) + 1);
+                    }
+                }
             }
-        } else {
-            // Datos por defecto si no hay productos
+            
+            // Tomar los top 5 productos más vendidos
+            ventasPorProducto.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(5)
+                .forEach(entry -> {
+                    pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                });
+        }
+        
+        if (pieChartData.isEmpty()) {
+            // Datos por defecto si no hay ventas
             pieChartData.add(new PieChart.Data("Sin datos", 1));
         }
         
@@ -271,16 +322,4 @@ public class DashboardController implements Initializable {
         logger.debug("Gráfico de productos top actualizado con {} productos", pieChartData.size());
     }
     
-    /**
-     * Maneja el cambio de período en el ComboBox
-     */
-    @FXML
-    public void cambiarPeriodo() {
-        String periodo = comboPeriodo.getValue();
-        logger.info("Cambiando período a: {}", periodo);
-        
-        // TODO: Implementar lógica para diferentes períodos
-        // Por ahora solo actualizamos los datos
-        actualizarDatos();
-    }
 }
