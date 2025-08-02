@@ -32,6 +32,8 @@
                     </columns>
                 </TableView>
                 <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Label text="Cantidad:"/>
+                    <Spinner fx:id="spinnerCantidad" prefWidth="80" min="1" max="100" initialValue="1"/>
                     <Button text="Agregar al Carrito" onAction="#agregarAlCarrito"/>
                 </HBox>
             </VBox>
@@ -54,6 +56,8 @@
                     <Label fx:id="lblTotal" text="0.00"/>
                 </HBox>
                 <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Label text="Cantidad a eliminar:"/>
+                    <Spinner fx:id="spinnerEliminar" prefWidth="80" min="1" max="100" initialValue="1"/>
                     <Button text="Remover" onAction="#removerDelCarrito"/>
                     <Button text="Finalizar Venta" onAction="#finalizarVenta"/>
                 </HBox>
