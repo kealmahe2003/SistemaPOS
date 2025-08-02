@@ -4,6 +4,8 @@ import com.cafeteriapos.models.Producto;
 import com.cafeteriapos.models.Venta;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,14 +16,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExcelManager {
+    private static final Logger logger = LoggerFactory.getLogger(ExcelManager.class);
     private static final String FILE_PATH = "data/registros_pos.xlsx";
     private static final DateTimeFormatter DATE_FORMATTER = 
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    
+    // Constantes para nombres de hojas
+    private static final String PRODUCTOS_SHEET = "Productos";
+    private static final String VENTAS_SHEET = "Ventas";
+    private static final String REGISTRO_CAJA_SHEET = "RegistroCaja";
+    
+    // Constantes para mensajes de log
+    private static final String BACKUP_MESSAGE = "Archivo corrupto respaldado como: ";
+    private static final String RECREATED_MESSAGE = "Archivo Excel recreado exitosamente en: ";
 
 
     public static void guardarVenta(Venta venta) {
         try (Workbook workbook = getOrCreateWorkbook()) {
-            Sheet sheet = getOrCreateSheet(workbook, "Ventas");
+            Sheet sheet = getOrCreateSheet(workbook, VENTAS_SHEET);
             
             // Crear headers si es la primera vez
             if (sheet.getLastRowNum() == 0) {
@@ -30,7 +42,7 @@ public class ExcelManager {
             
             Row row = sheet.createRow(sheet.getLastRowNum() + 1);
             row.createCell(0).setCellValue(venta.getId());
-            row.createCell(1).setCellValue(venta.getFecha().format(DATE_FORMATTER));
+            row.createCell(1).setCellValue(venta.getFechaHora().format(DATE_FORMATTER));
             row.createCell(2).setCellValue(venta.getTotal());
             
             saveWorkbook(workbook);
@@ -42,14 +54,14 @@ public class ExcelManager {
     private static void crearHeadersVenta(Sheet sheet) {
         Row header = sheet.createRow(0);
         header.createCell(0).setCellValue("ID Venta");
-        header.createCell(1).setCellValue("Fecha");
+        header.createCell(1).setCellValue("Fecha/Hora");
         header.createCell(2).setCellValue("Total");
     }
 
     public static void guardarProducto(Producto producto) {
         try {
             Workbook workbook = getOrCreateWorkbook();
-            Sheet sheet = getOrCreateSheet(workbook, "Productos");
+            Sheet sheet = getOrCreateSheet(workbook, PRODUCTOS_SHEET);
             
             if (sheet.getLastRowNum() == 0) {
                 crearHeadersProducto(sheet);
@@ -63,12 +75,12 @@ public class ExcelManager {
             saveWorkbook(workbook);
             workbook.close(); // Cerrar explícitamente después de guardar
         } catch (Exception e) {
-            System.err.println("Error al guardar producto: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al guardar producto: {}", e.getMessage());
+            logger.debug("Stack trace completo:", e);
             
             // Si falla, intentar recrear el archivo desde cero
             try {
-                System.out.println("Intentando recrear archivo Excel...");
+                logger.info("Intentando recrear archivo Excel...");
                 recreateExcelFile();
                 
                 // Intentar guardar otra vez con archivo limpio
@@ -82,10 +94,10 @@ public class ExcelManager {
                 
                 saveWorkbook(newWorkbook);
                 newWorkbook.close();
-                System.out.println("Producto guardado en archivo recreado");
+                logger.info("Producto guardado en archivo recreado");
             } catch (Exception fallbackException) {
-                System.err.println("Error crítico al guardar producto: " + fallbackException.getMessage());
-                fallbackException.printStackTrace();
+                logger.error("Error crítico al guardar producto: {}", fallbackException.getMessage());
+                logger.debug("Stack trace crítico:", fallbackException);
             }
         }
     }
@@ -97,7 +109,7 @@ public class ExcelManager {
             Sheet sheet = workbook.getSheet("Productos");
             if (sheet == null || sheet.getLastRowNum() == 0) {
                 // No hay datos, retornar lista vacía
-                System.out.println("No se encontraron productos en Excel. Retornando lista vacía.");
+                logger.info("No se encontraron productos en Excel. Retornando lista vacía.");
                 return productos;
             }
 
@@ -112,7 +124,7 @@ public class ExcelManager {
                     Cell stockCell = row.getCell(2);
                     
                     if (nombreCell == null || precioCell == null || stockCell == null) {
-                        System.out.println("Fila " + i + " tiene celdas vacías, saltando...");
+                        logger.debug("Fila {} tiene celdas vacías, saltando...", i);
                         continue;
                     }
                     
@@ -125,13 +137,13 @@ public class ExcelManager {
                     }
                     
                 } catch (Exception rowException) {
-                    System.err.println("Error procesando fila " + i + ": " + rowException.getMessage());
+                    logger.warn("Error procesando fila {}: {}", i, rowException.getMessage());
                     // Continuar con la siguiente fila en lugar de fallar completamente
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error crítico al leer productos: " + e.getMessage());
-            System.out.println("Intentando recuperar desde archivo backup o crear archivo limpio...");
+            logger.error("Error crítico al leer productos: {}", e.getMessage());
+            logger.info("Intentando recuperar desde archivo backup o crear archivo limpio...");
             
             // Intentar recuperación completa
             try {
@@ -139,13 +151,65 @@ public class ExcelManager {
                 // Intentar leer otra vez después de la recuperación
                 return leerProductosSeguro();
             } catch (Exception recoveryException) {
-                System.err.println("No se pudo recuperar el archivo Excel: " + recoveryException.getMessage());
-                System.out.println("Retornando lista vacía para permitir que la aplicación continúe.");
+                logger.error("No se pudo recuperar el archivo Excel: {}", recoveryException.getMessage());
+                logger.info("Retornando lista vacía para permitir que la aplicación continúe.");
             }
         }
         
-        System.out.println("Productos cargados exitosamente: " + productos.size());
+        logger.info("Productos cargados exitosamente: {}", productos.size());
         return productos;
+    }
+    
+    /**
+     * Lee todas las ventas desde el archivo Excel
+     * @return Lista de ventas registradas
+     */
+    public static List<Venta> leerVentas() {
+        List<Venta> ventas = new ArrayList<>();
+        
+        try (Workbook workbook = getOrCreateWorkbook()) {
+            Sheet sheet = workbook.getSheet(VENTAS_SHEET);
+            if (sheet == null || sheet.getLastRowNum() == 0) {
+                logger.info("No se encontraron ventas en Excel. Retornando lista vacía.");
+                return ventas;
+            }
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+                
+                try {
+                    Cell idCell = row.getCell(0);
+                    Cell fechaCell = row.getCell(1);
+                    Cell totalCell = row.getCell(2);
+                    
+                    if (idCell == null || fechaCell == null || totalCell == null) {
+                        logger.debug("Fila {} de ventas tiene celdas vacías, saltando...", i);
+                        continue;
+                    }
+                    
+                    String id = idCell.getStringCellValue();
+                    String fechaStr = fechaCell.getStringCellValue();
+                    double total = totalCell.getNumericCellValue();
+                    
+                    // Parsear fecha
+                    LocalDateTime fecha = LocalDateTime.parse(fechaStr, DATE_FORMATTER);
+                    
+                    // Crear venta (sin items por ahora, solo datos básicos)
+                    Venta venta = new Venta(id, fecha, new ArrayList<>(), total);
+                    ventas.add(venta);
+                    
+                } catch (Exception rowException) {
+                    logger.warn("Error procesando fila {} de ventas: {}", i, rowException.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error al leer ventas: {}", e.getMessage());
+            logger.info("Retornando lista vacía de ventas.");
+        }
+        
+        logger.info("Ventas cargadas exitosamente: {}", ventas.size());
+        return ventas;
     }
     
     /**
@@ -155,9 +219,9 @@ public class ExcelManager {
         List<Producto> productos = new ArrayList<>();
         try (Workbook workbook = createNewWorkbook()) {
             // En este punto tenemos un archivo limpio, retornamos lista vacía
-            System.out.println("Archivo Excel recuperado. Lista de productos vacía - listo para agregar nuevos productos.");
+            logger.info("Archivo Excel recuperado. Lista de productos vacía - listo para agregar nuevos productos.");
         } catch (Exception e) {
-            System.err.println("Error incluso con archivo limpio: " + e.getMessage());
+            logger.error("Error incluso con archivo limpio: {}", e.getMessage());
         }
         return productos;
     }
@@ -173,14 +237,14 @@ public class ExcelManager {
             String timestamp = String.valueOf(System.currentTimeMillis());
             File backupFile = new File(FILE_PATH + ".corrupted." + timestamp);
             if (file.renameTo(backupFile)) {
-                System.out.println("Archivo corrupto respaldado como: " + backupFile.getName());
+                logger.info("Archivo corrupto respaldado como: {}", backupFile.getName());
             }
         }
         
         // Crear archivo completamente nuevo
         try (Workbook newWorkbook = createNewWorkbook()) {
             // El archivo se guarda automáticamente en createNewWorkbook()
-            System.out.println("Archivo Excel recreado exitosamente en: " + FILE_PATH);
+            logger.info("Archivo Excel recreado exitosamente en: {}", FILE_PATH);
         }
     }
 
@@ -283,12 +347,12 @@ public class ExcelManager {
             return WorkbookFactory.create(file);
         } catch (Exception e) {
             // Si hay error al leer el archivo (corrupto, ZLIB, etc.), crear uno nuevo
-            System.err.println("Archivo Excel corrupto, creando uno nuevo: " + e.getMessage());
+            logger.warn("Archivo Excel corrupto, creando uno nuevo: {}", e.getMessage());
             // Hacer backup del archivo corrupto
             File backupFile = new File(FILE_PATH + ".backup." + System.currentTimeMillis());
             if (file.exists()) {
                 file.renameTo(backupFile);
-                System.out.println("Archivo corrupto respaldado como: " + backupFile.getName());
+                logger.info("Archivo corrupto respaldado como: {}", backupFile.getName());
             }
             return createNewWorkbook();
         }
@@ -347,7 +411,7 @@ public class ExcelManager {
             // Hacer backup del archivo corrupto
             File backupFile = new File(FILE_PATH + ".corrupted." + System.currentTimeMillis());
             file.renameTo(backupFile);
-            System.out.println("Archivo corrupto respaldado como: " + backupFile.getName());
+            logger.info("Archivo corrupto respaldado como: {}", backupFile.getName());
         }
     }
 
@@ -364,24 +428,24 @@ public class ExcelManager {
                 String timestamp = String.valueOf(System.currentTimeMillis());
                 File backupFile = new File(FILE_PATH + ".backup." + timestamp);
                 if (file.renameTo(backupFile)) {
-                    System.out.println("Archivo respaldado como: " + backupFile.getName());
+                    logger.info("Archivo respaldado como: {}", backupFile.getName());
                 }
             }
             
             // Crear archivo completamente nuevo
             try (Workbook newWorkbook = createNewWorkbook()) {
-                System.out.println("Archivo Excel recreado exitosamente en: " + FILE_PATH);
+                logger.info("Archivo Excel recreado exitosamente en: {}", FILE_PATH);
                 return true;
             }
             
         } catch (Exception e) {
-            System.err.println("Error al forzar recreación del archivo: " + e.getMessage());
+            logger.error("Error al forzar recreación del archivo: {}", e.getMessage());
             return false;
         }
     }
 
     private static void handleError(String message, Exception e) {
-        System.err.println(message + ": " + e.getMessage());
-        // Logger.error(message, e); // Implementar en producción
+        logger.error("{}: {}", message, e.getMessage());
+        logger.debug("Stack trace completo:", e);
     }
 }
