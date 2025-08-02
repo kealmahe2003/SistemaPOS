@@ -60,7 +60,15 @@ jobs:
             core.setOutput('head_sha', pr.head.sha);
             core.setOutput('base_ref', pr.base.ref);
 
-      - name: Wait and check all required status checks
+      - name: Wait 10 minutes for all checks to complete
+        if: steps.pr-info.outputs.merge == 'true'
+        run: |
+          echo "⏱️ Waiting 10 minutes for all checks (including SonarCloud) to complete..."
+          echo "Started at: $(date)"
+          sleep 600  # 10 minutos = 600 segundos
+          echo "Wait completed at: $(date)"
+
+      - name: Check all required status checks and auto-merge
         if: steps.pr-info.outputs.merge == 'true'
         uses: actions/github-script@v7
         with:
@@ -77,10 +85,24 @@ jobs:
               return;
             }
             
-            console.log(`Checking status for PR #${prNumber} (${headSha})`);
+            console.log(`Checking status for PR #${prNumber} (${headSha}) after 10-minute wait`);
             
-            // Esperar un poco para que los checks se completen
-            await new Promise(resolve => setTimeout(resolve, 15000));
+            // Verificar que el PR siga abierto después de la espera
+            const prResponse = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: prNumber
+            });
+            
+            if (prResponse.data.state !== 'open') {
+              console.log(`PR #${prNumber} is no longer open (state: ${prResponse.data.state})`);
+              return;
+            }
+            
+            if (prResponse.data.merged) {
+              console.log(`PR #${prNumber} has already been merged manually`);
+              return;
+            }
             
             // Obtener el estado combinado de todos los checks
             const statusResponse = await github.rest.repos.getCombinedStatusForRef({
@@ -137,7 +159,7 @@ jobs:
                                (sonarCheckPassed || !hasRequiredChecks);
             
             if (shouldMerge) {
-              console.log("All checks passed! Attempting auto-merge...");
+              console.log("✅ All checks passed after 10-minute wait! Attempting auto-merge...");
               
               try {
                 const mergeResult = await github.rest.pulls.merge({
@@ -146,34 +168,42 @@ jobs:
                   pull_number: prNumber,
                   merge_method: "merge",
                   commit_title: `Auto-merge PR #${prNumber}`,
-                  commit_message: "Automatically merged after all required checks passed ✅"
+                  commit_message: "Automatically merged after 10-minute wait and all required checks passed ✅"
                 });
                 
-                console.log(`✅ PR #${prNumber} merged successfully!`);
+                console.log(`✅ PR #${prNumber} merged successfully after 10-minute wait!`);
                 
                 // Agregar comentario de confirmación
                 await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: prNumber,
-                  body: "🎉 This PR was automatically merged after all required checks passed!"
+                  body: "🎉 This PR was automatically merged after waiting 10 minutes for all checks to complete!\n\n⏱️ **Auto-merge process:**\n- Waited 10 minutes for all checks to complete\n- Verified all required checks passed\n- Merged automatically ✅"
                 });
                 
               } catch (error) {
-                console.log(`❌ Failed to merge PR: ${error.message}`);
+                console.log(`❌ Failed to merge PR after 10-minute wait: ${error.message}`);
                 
                 // Agregar comentario sobre el fallo
                 await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: prNumber,
-                  body: `⚠️ Auto-merge failed: ${error.message}\n\nPlease merge manually.`
+                  body: `⚠️ Auto-merge failed after 10-minute wait: ${error.message}\n\n**Status after wait:**\n- Status checks: ${allStatusChecksPass ? '✅' : '❌'}\n- Check runs: ${allCheckRunsPass ? '✅' : '❌'}\n- SonarCloud: ${sonarCheckPassed ? '✅' : '❌'}\n\nPlease merge manually.`
                 });
               }
             } else {
-              console.log("❌ Not all required checks passed. Conditions:");
+              console.log("❌ Not all required checks passed after 10-minute wait:");
               console.log(`  - Status checks: ${allStatusChecksPass}`);
               console.log(`  - Check runs: ${allCheckRunsPass}`);
               console.log(`  - SonarCloud: ${sonarCheckPassed}`);
               console.log(`  - Has required checks: ${hasRequiredChecks}`);
+              
+              // Agregar comentario informativo sobre checks pendientes
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body: `⏱️ **Auto-merge update after 10-minute wait:**\n\n**Check Status:**\n- Status checks: ${allStatusChecksPass ? '✅ Passed' : '❌ Failed'}\n- Check runs: ${allCheckRunsPass ? '✅ Passed' : '❌ Failed'}\n- SonarCloud: ${sonarCheckPassed ? '✅ Passed' : hasRequiredChecks ? '❌ Failed' : '⚠️ Not found'}\n\n${!shouldMerge ? '**Action needed:** Some checks are still failing. Please review and merge manually.' : ''}`
+              });
             }
