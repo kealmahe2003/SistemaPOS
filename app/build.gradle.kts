@@ -28,6 +28,7 @@ dependencies {
     // Test
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+    testImplementation("org.junit.platform:junit-platform-suite:1.10.0")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 }
 
