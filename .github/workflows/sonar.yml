@@ -45,24 +45,15 @@ jobs:
         find . -name "jacocoTestReport.xml" -type f
         ls -la app/build/reports/jacoco/test/ || echo "Directory not found"
         
-    - name: Debug SonarCloud configuration
-      run: |
-        echo "Project Key: kealmahe2003_SistemaPOS"
-        echo "Organization: kealmahe2003"
-        echo "Host URL: https://sonarcloud.io"
-        echo "Token set: ${{ secrets.SONAR_TOKEN != '' }}"
-        
     - name: SonarCloud Scan
-      uses: SonarSource/sonarqube-scan-action@v5.0.0
+      uses: SonarSource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: https://sonarcloud.io
       with:
         args: >
           -Dsonar.projectKey=kealmahe2003_SistemaPOS
           -Dsonar.organization=kealmahe2003
-          -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.java.source=21
           -Dsonar.java.target=21
           -Dsonar.sources=app/src/main/java
