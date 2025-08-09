@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cafeteriapos.controllers.DashboardController" styleClass="dashboard-scroll" fitToWidth="true">
+   <content>
+      <VBox styleClass="dashboard-container" spacing="30.0">
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+         
+         <!-- Título Principal -->
+         <VBox styleClass="title-section" spacing="5.0">
+            <Label text="Dashboard Analytics" styleClass="main-title" />
+            <Label text="Monitoreo en tiempo real de tu negocio" styleClass="subtitle" />
+            <Label fx:id="lblUltimaActualizacion" text="Ultima actualizacion: --:--" styleClass="ultima-actualizacion" />
+         </VBox>
+         
+         <!-- Test Simple Card -->
+         <VBox spacing="20.0">
+            <Label text="Ventas de Hoy" />
+            <Label fx:id="lblVentasHoy" text="$0.00" />
+            <Label fx:id="lblIngresosHoy" text="$0.00" />
+            <Label fx:id="lblCostosHoy" text="$0.00" />
+            <Label fx:id="lblTransaccionesHoy" text="0" />
+            <Label fx:id="lblPromedioVenta" text="$0" />
+            <Label fx:id="lblProductoTop" text="Ninguno" />
+            <Label fx:id="lblCantidadTop" text="0" />
+            <Label fx:id="lblIngresosTop" text="$0" />
+         </VBox>
+         
+         <!-- Test Charts -->
+         <HBox spacing="20.0">
+            <BarChart fx:id="chartVentasDiarias" animated="true" minHeight="300.0" prefHeight="350.0">
+               <xAxis>
+                  <CategoryAxis fx:id="xAxisDias" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis fx:id="yAxisVentas" />
+               </yAxis>
+            </BarChart>
+            
+            <PieChart fx:id="chartProductosTop" animated="true" minHeight="300.0" prefHeight="350.0" />
+         </HBox>
+         
+         <!-- Test Buttons -->
+         <HBox spacing="15.0">
+            <Button fx:id="btnActualizar" onAction="#actualizarDatos" text="Actualizar Datos" />
+            <Button onAction="#exportarReporte" text="Exportar Reporte" />
+            <Button onAction="#configurarDashboard" text="Configurar Dashboard" />
+            <Button onAction="#limpiarBaseDatos" text="Limpiar BD" />
+         </HBox>
+      </VBox>
+   </content>
+</ScrollPane>

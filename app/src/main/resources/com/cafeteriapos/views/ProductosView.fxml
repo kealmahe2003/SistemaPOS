@@ -37,7 +37,7 @@
                 <Button text="Seleccionar" onAction="#seleccionarProducto"/>
                 <Button text="Eliminar" onAction="#eliminarProducto" style="-fx-background-color: #ff4444; -fx-text-fill: white;"/>
                 <Separator orientation="VERTICAL"/>
-                <Button text="Recrear Excel" onAction="#recrearArchivoExcel" style="-fx-background-color: #ff8800; -fx-text-fill: white;" />
+                <Button text="Backup BD" onAction="#crearBackupBaseDatos" style="-fx-background-color: #ff8800; -fx-text-fill: white;" />
             </HBox>
         </VBox>
     </top>

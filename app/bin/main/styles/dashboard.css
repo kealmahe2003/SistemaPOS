@@ -1,6 +1,3 @@
-/* ========================================= */
-/* DASHBOARD MODERNO - INSPIRADO EN TAILWIND */
-/* ========================================= */
 
 /* === CONTENEDOR PRINCIPAL === */
 .dashboard-scroll {
@@ -428,7 +425,6 @@
 
 .dashboard-scroll .scroll-bar:vertical .thumb:hover {
     -fx-background-color: #84cc16;
-}
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);
     -fx-spacing: 10;
 }

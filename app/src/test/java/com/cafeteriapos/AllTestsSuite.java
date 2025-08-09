@@ -20,8 +20,8 @@ class AllTestsSuite {
             new com.cafeteriapos.models.Producto("Test", 1.0, 1);
             new com.cafeteriapos.models.Venta();
             
-            // Test que las clases Utils tienen métodos estáticos accesibles
-            com.cafeteriapos.utils.ExcelManager.leerProductos();
+            // Test que DatabaseManager tiene métodos estáticos accesibles
+            com.cafeteriapos.utils.DatabaseManager.leerProductos();
             
         }, "Las clases principales deben ser instanciables");
     }
@@ -32,8 +32,8 @@ class AllTestsSuite {
         // When & Then - El sistema no debe fallar con operaciones básicas
         assertDoesNotThrow(() -> {
             // Operaciones que no deben fallar nunca
-            com.cafeteriapos.utils.ExcelManager.leerProductos();
-            com.cafeteriapos.utils.ExcelManager.leerVentas();
+            com.cafeteriapos.utils.DatabaseManager.leerProductos();
+            com.cafeteriapos.utils.DatabaseManager.leerVentas();
             com.cafeteriapos.utils.CajaManager.registrarError("Test", "Test Error");
             
         }, "El sistema debe manejar operaciones básicas sin fallar");
