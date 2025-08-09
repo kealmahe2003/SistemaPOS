@@ -3818,3 +3818,35 @@ SELECT COUNT(*) FROM caja_registros [42102-224]
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_registros" no encontrada
 Table "caja_registros" not found; SQL statement:
 SELECT COUNT(*) FROM caja_registros [42102-224]
+2025-08-08 21:22:24.356415-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_movimientos" no encontrada
+Table "caja_movimientos" not found; SQL statement:
+DELETE FROM caja_movimientos WHERE 1=1 [42102-224]
+2025-08-08 21:22:24.424449-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_movimientos" no encontrada
+Table "caja_movimientos" not found; SQL statement:
+DELETE FROM caja_movimientos WHERE 1=1 [42102-224]
+2025-08-08 21:22:24.546658-05:00 jdbc[5]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_registros" no encontrada
+Table "caja_registros" not found; SQL statement:
+SELECT COUNT(*) FROM caja_registros [42102-224]
+2025-08-08 21:22:24.771677-05:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_registros" no encontrada
+Table "caja_registros" not found; SQL statement:
+SELECT COUNT(*) FROM caja_registros [42102-224]
+2025-08-08 21:22:47.909115-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_movimientos" no encontrada
+Table "caja_movimientos" not found; SQL statement:
+DELETE FROM caja_movimientos WHERE 1=1 [42102-224]
+2025-08-08 21:22:47.964065-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_movimientos" no encontrada
+Table "caja_movimientos" not found; SQL statement:
+DELETE FROM caja_movimientos WHERE 1=1 [42102-224]
+2025-08-08 21:22:48.101657-05:00 jdbc[5]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_registros" no encontrada
+Table "caja_registros" not found; SQL statement:
+SELECT COUNT(*) FROM caja_registros [42102-224]
+2025-08-08 21:22:48.541618-05:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "caja_registros" no encontrada
+Table "caja_registros" not found; SQL statement:
+SELECT COUNT(*) FROM caja_registros [42102-224]
