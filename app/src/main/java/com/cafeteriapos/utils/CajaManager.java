@@ -12,7 +12,7 @@ public class CajaManager {
             "APERTURA - Monto inicial: $%.2f", 
             montoInicial
         );
-        ExcelManager.registrarOperacionCaja(registro);
+        DatabaseManager.registrarOperacionCaja(registro);
     }
 
     public static void registrarCierre(double montoFinal) {
@@ -20,7 +20,7 @@ public class CajaManager {
             "CIERRE - Monto final: $%.2f", 
             montoFinal
         );
-        ExcelManager.registrarOperacionCaja(registro);
+        DatabaseManager.registrarOperacionCaja(registro);
     }
 
     public static void registrarVenta(String idVenta, double monto) {
@@ -29,7 +29,7 @@ public class CajaManager {
             idVenta, 
             monto
         );
-        ExcelManager.registrarOperacionCaja(registro);
+        DatabaseManager.registrarOperacionCaja(registro);
     }
 
     public static void registrarMovimiento(String tipo, double monto, String motivo) {
@@ -39,7 +39,7 @@ public class CajaManager {
             monto, 
             motivo
         );
-        ExcelManager.registrarOperacionCaja(registro);
+        DatabaseManager.registrarOperacionCaja(registro);
     }
 
     public static void registrarError(String operacion, String mensajeError) {
@@ -48,6 +48,6 @@ public class CajaManager {
             operacion, 
             mensajeError
         );
-        ExcelManager.registrarOperacionCaja(registro);
+        DatabaseManager.registrarOperacionCaja(registro);
     }
 }

@@ -3,7 +3,7 @@ package com.cafeteriapos.controllers;
 import com.cafeteriapos.models.Producto;
 import com.cafeteriapos.models.Venta;
 import com.cafeteriapos.utils.CajaManager;
-import com.cafeteriapos.utils.ExcelManager;
+import com.cafeteriapos.utils.DatabaseManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -48,9 +48,9 @@ public class VentasController {
 
     private List<Producto> cargarProductosSafely() {
         try {
-            List<Producto> productos = ExcelManager.leerProductos();
+            List<Producto> productos = DatabaseManager.leerProductos();
             
-            // Si no hay productos, crear algunos en memoria sin guardar en Excel por ahora
+            // Si no hay productos, crear algunos en memoria sin guardar en BD por ahora
             if (productos.isEmpty()) {
                 logger.info("No se encontraron productos. Usando productos de ejemplo en memoria...");
                 return crearProductosDeEjemploEnMemoria();
@@ -141,7 +141,7 @@ public class VentasController {
     }
 
     private void cargarProductos() {
-        productosDisponibles.setAll(ExcelManager.leerProductos());
+        productosDisponibles.setAll(DatabaseManager.leerProductos());
     }
 
     private void configurarBusqueda() {
@@ -291,13 +291,13 @@ public class VentasController {
                     int nuevoStock = productoOriginal.getStock() - itemCarrito.getCantidad();
                     productoOriginal.setStock(Math.max(0, nuevoStock)); // Asegurar que no sea negativo
                     
-                    // Guardar el producto actualizado en Excel
-                    ExcelManager.actualizarProducto(productoOriginal);
+                    // Guardar el producto actualizado en H2 Database
+                    DatabaseManager.actualizarProducto(productoOriginal);
                 }
             });
 
-            // Guardar la venta
-            ExcelManager.guardarVenta(venta);
+            // Guardar la venta en H2 Database
+            DatabaseManager.guardarVenta(venta);
             CajaManager.registrarVenta(venta.getId(), venta.getTotal());
             
             mostrarAlerta("Éxito", String.format(

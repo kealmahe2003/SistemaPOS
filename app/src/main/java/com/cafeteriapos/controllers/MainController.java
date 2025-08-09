@@ -38,7 +38,7 @@ public class MainController {
 
     @FXML
     private void abrirEstadisticas() {
-        cargarVista("/com/cafeteriapos/views/DashboardView.fxml");
+        cargarVista("/com/cafeteriapos/views/DashboardViewBasic.fxml");
     }
 
     private void cargarVista(String fxmlPath) {

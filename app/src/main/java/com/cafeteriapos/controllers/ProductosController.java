@@ -1,9 +1,12 @@
 package com.cafeteriapos.controllers;
 
 import com.cafeteriapos.models.Producto;
-import com.cafeteriapos.utils.ExcelManager;
+import com.cafeteriapos.utils.DatabaseManager;
+import com.cafeteriapos.performance.DatabaseQueryOptimizer;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -11,9 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ProductosController {
     private static final Logger logger = LoggerFactory.getLogger(ProductosController.class);
+    
+    // Sistema de actualización automática
+    private ScheduledExecutorService actualizacionService;
+    private DatabaseQueryOptimizer optimizer;
 
     // Componentes UI
     @FXML private TableView<Producto> tablaProductos;
@@ -32,37 +42,87 @@ public class ProductosController {
         configurarValidaciones();
         configurarTabla();
         configurarSpinner();
+        inicializarSistemaActualizacion();
         cargarProductos();
+    }
+    
+    /**
+     * Inicializa el sistema de actualización automática de productos
+     */
+    private void inicializarSistemaActualizacion() {
+        try {
+            // Obtener instancia del optimizer
+            optimizer = DatabaseQueryOptimizer.getInstance();
+            
+            // Configurar actualización automática cada 10 segundos
+            actualizacionService = Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread t = new Thread(r, "ProductosController-Updater");
+                t.setDaemon(true);
+                return t;
+            });
+            
+            // Verificar cambios cada 10 segundos
+            actualizacionService.scheduleAtFixedRate(this::verificarCambiosEnProductos, 
+                                                   10, 10, TimeUnit.SECONDS);
+            
+            logger.info("Sistema de actualización automática de productos iniciado");
+            
+        } catch (Exception e) {
+            logger.error("Error al inicializar sistema de actualización: {}", e.getMessage());
+        }
+    }
+    
+    /**
+     * Verifica si hay cambios en los productos y recarga si es necesario
+     */
+    private void verificarCambiosEnProductos() {
+        try {
+            // Usar DatabaseManager para obtener productos actuales desde H2 (1-5ms)
+            List<Producto> productosActuales = DatabaseManager.leerProductos();
+            
+            // Comparar con los productos en memoria
+            if (productosActuales.size() != productos.size() || 
+                !productosActuales.equals(productos)) {
+                
+                logger.info("Cambios detectados en productos, recargando datos...");
+                
+                // Actualizar en el hilo de JavaFX
+                Platform.runLater(() -> {
+                    productos.setAll(productosActuales);
+                    logger.info("Productos actualizados: {} productos cargados", productosActuales.size());
+                });
+            }
+            
+        } catch (Exception e) {
+            logger.debug("Error en verificación de cambios: {}", e.getMessage());
+        }
     }
 
     /**
      * Método para recrear el archivo Excel en caso de corrupción extrema
      */
     @FXML
-    private void recrearArchivoExcel() {
+    private void crearBackupBaseDatos() {
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmacion.setTitle("Recrear Archivo Excel");
-        confirmacion.setHeaderText("¿Recrear archivo Excel?");
+        confirmacion.setTitle("Crear Backup Base de Datos");
+        confirmacion.setHeaderText("¿Crear backup de la base de datos?");
         confirmacion.setContentText(
-            "Esta acción creará un archivo Excel completamente nuevo.\n" +
-            "El archivo actual será respaldado.\n\n" +
+            "Esta acción creará un backup completo de la base de datos H2.\n" +
+            "El backup se guardará en la carpeta data.\n\n" +
             "¿Desea continuar?");
 
         confirmacion.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                if (ExcelManager.forzarRecreacionArchivo()) {
+                if (DatabaseManager.crearBackup()) {
                     mostrarAlerta("Éxito", 
-                        "Archivo Excel recreado exitosamente.\n" +
-                        "El archivo anterior fue respaldado.\n" +
-                        "Puede comenzar a agregar productos nuevamente.");
+                        "Backup de base de datos creado exitosamente.\n" +
+                        "El archivo de backup se encuentra en la carpeta data.");
                     
-                    // Limpiar la lista actual y recargar
-                    productos.clear();
+                    // Recargar productos después del backup
                     cargarProductos();
-                    limpiarFormulario();
                 } else {
                     mostrarError("Error", 
-                        "No se pudo recrear el archivo Excel.\n" +
+                        "No se pudo crear el backup de la base de datos.\n" +
                         "Verifique los permisos del directorio.");
                 }
             }
@@ -100,12 +160,12 @@ public class ProductosController {
 
     private void cargarProductos() {
         try {
-            List<Producto> productosLeidos = ExcelManager.leerProductos();
+            List<Producto> productosLeidos = DatabaseManager.leerProductos();
             productos.setAll(productosLeidos);
             
             if (productosLeidos.isEmpty()) {
                 mostrarAlerta("Información", 
-                    "No se encontraron productos en el archivo.\n" +
+                    "No se encontraron productos en la base de datos.\n" +
                     "Puede comenzar agregando nuevos productos.");
             } else {
                 logger.info("Productos cargados: {}", productosLeidos.size());
@@ -142,7 +202,7 @@ public class ProductosController {
             }
 
             productos.add(producto);
-            ExcelManager.guardarProducto(producto);
+            DatabaseManager.guardarProducto(producto);
             limpiarFormulario();
             
         } catch (NumberFormatException e) {
@@ -186,7 +246,7 @@ public class ProductosController {
                 if (response == ButtonType.OK) {
                     try {
                         productos.remove(seleccionado);
-                        ExcelManager.eliminarProducto(seleccionado);
+                        DatabaseManager.eliminarProducto(seleccionado);
                         mostrarAlerta("Éxito", "Producto eliminado correctamente");
                         limpiarFormulario();
                     } catch (Exception e) {
@@ -221,7 +281,7 @@ public class ProductosController {
                 seleccionado.setStock(spinnerStock.getValue());
                 
                 tablaProductos.refresh();
-                ExcelManager.actualizarProducto(seleccionado); // Usar método actualizar
+                DatabaseManager.actualizarProducto(seleccionado); // Usar método actualizar
                 limpiarFormulario();
                 
                 mostrarAlerta("Éxito", "Producto actualizado correctamente");
@@ -258,5 +318,23 @@ public class ProductosController {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+    
+    /**
+     * Método de limpieza cuando se destruye el controller
+     */
+    public void shutdown() {
+        if (actualizacionService != null && !actualizacionService.isShutdown()) {
+            actualizacionService.shutdown();
+            try {
+                if (!actualizacionService.awaitTermination(2, TimeUnit.SECONDS)) {
+                    actualizacionService.shutdownNow();
+                }
+                logger.info("Sistema de actualización de productos detenido correctamente");
+            } catch (InterruptedException e) {
+                actualizacionService.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }

@@ -19,11 +19,9 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("ch.qos.logback:logback-classic:1.4.12")
     
-    // Apache POI (Excel)
-    implementation("org.apache.poi:poi:5.2.5")
-    implementation("org.apache.poi:poi-ooxml:5.2.5") {
-        exclude(group = "com.github.virtuald", module = "curvesapi")
-    }
+    // H2 Database (modo PostgreSQL)
+    implementation("com.h2database:h2:2.2.224")
+    implementation("org.postgresql:postgresql:42.7.1") // Para sintaxis PostgreSQL completa
     
     // Test
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")

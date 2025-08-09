@@ -1,53 +1,174 @@
+/* ========================================= */
+/* SISTEMA POS - ESTILOS PROFESIONALES */
+/* ========================================= */
+
 /* Estilos generales */
 .root {
     -fx-font-family: 'Segoe UI', Arial, sans-serif;
     font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-background-color: #f8fafc;
+    background-color: #f8fafc;
 }
 
-/* Menú lateral */
+/* Menú lateral profesional */
 .menu-lateral {
-    -fx-background-color: #2c3e50;
-    background-color: #2c3e50;
-    -fx-border-color: #34495e;
-    border-color: #34495e;
+    -fx-background-color: linear-gradient(to bottom, #1e293b, #334155);
+    background-color: #1e293b;
+    -fx-border-color: #475569;
+    border-color: #475569;
     -fx-border-width: 0 1 0 0;
     border-width: 0 1 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 8, 0, 2, 0);
 }
 
 .titulo-menu {
-    -fx-font-size: 18px;
-    font-size: 18px;
+    -fx-font-size: 20px;
+    font-size: 20px;
     -fx-font-weight: bold;
     font-weight: bold;
-    -fx-text-fill: #ecf0f1;
-    -fx-padding: 0 0 10 0;
-    padding: 0 0 10 0;
+    -fx-text-fill: #f1f5f9;
+    color: #f1f5f9;
+    -fx-padding: 0 0 15 0;
+    padding: 0 0 15 0;
 }
 
 .boton-menu {
     -fx-background-color: transparent;
     background-color: transparent;
-    -fx-text-fill: #ecf0f1;
+    -fx-text-fill: #cbd5e1;
+    color: #cbd5e1;
     -fx-font-size: 14px;
     font-size: 14px;
+    -fx-font-weight: 500;
+    font-weight: 500;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 8 12;
-    padding: 8 12;
-    -fx-border-radius: 4;
-    border-radius: 4px;
+    -fx-padding: 12 16;
+    padding: 12 16;
+    -fx-background-radius: 8;
+    border-radius: 8px;
     -fx-cursor: hand;
     cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
+    -fx-effect: null;
 }
 
 .boton-menu:hover {
-    -fx-background-color: #34495e;
-    background-color: #34495e;
-    -fx-text-fill: #3498db;
+    -fx-background-color: #475569;
+    background-color: #475569;
+    -fx-text-fill: #3b82f6;
+    color: #3b82f6;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.2), 8, 0, 0, 2);
 }
 
 .boton-salir {
-    -fx-background-color: #e74c3c;
+    -fx-background-color: #ef4444;
+    background-color: #ef4444;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: 500;
+    font-weight: 500;
+    -fx-padding: 12 16;
+    padding: 12 16;
+    -fx-background-radius: 8;
+    border-radius: 8px;
+    -fx-cursor: hand;
+    cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.3), 8, 0, 0, 2);
+}
+
+.boton-salir:hover {
+    -fx-background-color: #dc2626;
+    background-color: #dc2626;
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.4), 12, 0, 0, 4);
+}
+
+/* === ESTILOS PROFESIONALES GENERALES === */
+.content-area {
+    -fx-background-color: #f8fafc;
+    background-color: #f8fafc;
+    -fx-padding: 25;
+    padding: 25px;
+}
+
+.card-professional {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-background-radius: 12;
+    border-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 15, 0, 0, 4);
+    -fx-padding: 25 30 25 30;
+    padding: 25px 30px;
+    -fx-border-color: #e2e8f0;
+    border-color: #e2e8f0;
+    -fx-border-width: 1;
+    border-width: 1px;
+    -fx-border-radius: 12;
+}
+
+.title-professional {
+    -fx-font-size: 24px;
+    font-size: 24px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1e293b;
+    color: #1e293b;
+}
+
+.subtitle-professional {
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-text-fill: #64748b;
+    color: #64748b;
+    -fx-font-weight: 500;
+    font-weight: 500;
+}
+
+.button-professional {
+    -fx-background-color: #3b82f6;
+    background-color: #3b82f6;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: 500;
+    font-weight: 500;
+    -fx-background-radius: 8;
+    border-radius: 8px;
+    -fx-padding: 12 20;
+    padding: 12px 20px;
+    -fx-cursor: hand;
+    cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.3), 8, 0, 0, 2);
+}
+
+.button-professional:hover {
+    -fx-background-color: #2563eb;
+    background-color: #2563eb;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.4), 12, 0, 0, 4);
+}
+
+.input-professional {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #d1d5db;
+    border-color: #d1d5db;
+    -fx-border-width: 1;
+    border-width: 1px;
+    -fx-border-radius: 8;
+    border-radius: 8px;
+    -fx-background-radius: 8;
+    -fx-padding: 12 16;
+    padding: 12px 16px;
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);
+}
+
+.input-professional:focused {
+    -fx-border-color: #3b82f6;
+    border-color: #3b82f6;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.2), 8, 0, 0, 2);
     background-color: #e74c3c;
     -fx-text-fill: white;
     -fx-font-weight: bold;

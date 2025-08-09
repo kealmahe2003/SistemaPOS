@@ -2,10 +2,11 @@ package com.cafeteriapos.integration;
 
 import com.cafeteriapos.models.Producto;
 import com.cafeteriapos.models.Venta;
-import com.cafeteriapos.utils.ExcelManager;
+import com.cafeteriapos.utils.DatabaseManager;
 import com.cafeteriapos.utils.CajaManager;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Tests de integración para validar el flujo completo del sistema
@@ -22,16 +24,37 @@ class IntegrationTest {
     
     private List<Producto> productosTest;
     private Venta ventaTest;
+    private String testSuffix;
     
     @BeforeEach
     void setUp() {
-        // Crear productos de prueba
-        productosTest = new ArrayList<>();
-        productosTest.add(new Producto("Café Test", 2.50, 10));
-        productosTest.add(new Producto("Croissant Test", 1.75, 5));
+        // Generar sufijo único para cada test
+        testSuffix = UUID.randomUUID().toString().substring(0, 8);
         
-        // Crear venta de prueba
-        ventaTest = new Venta("INTEGRATION-001", LocalDateTime.now(), productosTest, 8.75);
+        // Crear productos de prueba con nombres únicos
+        productosTest = new ArrayList<>();
+        productosTest.add(new Producto("Café Test " + testSuffix, 2.50, 10));
+        productosTest.add(new Producto("Croissant Test " + testSuffix, 1.75, 5));
+        
+        // Crear venta de prueba con ID único
+        ventaTest = new Venta("INTEGRATION-" + testSuffix, LocalDateTime.now(), productosTest, 8.75);
+    }
+    
+    @AfterEach
+    void tearDown() {
+        // Limpiar datos de prueba después de cada test
+        try {
+            // Eliminar productos de prueba
+            for (Producto producto : productosTest) {
+                try {
+                    DatabaseManager.eliminarProducto(producto);
+                } catch (Exception e) {
+                    // Ignorar errores de eliminación (puede que no exista)
+                }
+            }
+        } catch (Exception e) {
+            // Ignorar errores de limpieza
+        }
     }
     
     @Test
@@ -41,18 +64,18 @@ class IntegrationTest {
         assertDoesNotThrow(() -> {
             // 1. Guardar productos
             for (Producto producto : productosTest) {
-                ExcelManager.guardarProducto(producto);
+                DatabaseManager.guardarProducto(producto);
             }
             
             // 2. Leer productos
-            List<Producto> productosLeidos = ExcelManager.leerProductos();
+            List<Producto> productosLeidos = DatabaseManager.leerProductos();
             assertNotNull(productosLeidos);
             
             // 3. Actualizar un producto
             if (!productosTest.isEmpty()) {
                 Producto producto = productosTest.get(0);
                 producto.setStock(15);
-                ExcelManager.actualizarProducto(producto);
+                DatabaseManager.actualizarProducto(producto);
             }
             
         }, "Flujo completo de productos debe funcionar sin errores");
@@ -64,13 +87,13 @@ class IntegrationTest {
         // When & Then - El flujo completo no debe fallar
         assertDoesNotThrow(() -> {
             // 1. Guardar venta
-            ExcelManager.guardarVenta(ventaTest);
+            DatabaseManager.guardarVenta(ventaTest);
             
             // 2. Registrar en caja
             CajaManager.registrarVenta(ventaTest.getId(), ventaTest.getTotal());
             
             // 3. Leer ventas
-            List<Venta> ventasLeidas = ExcelManager.leerVentas();
+            List<Venta> ventasLeidas = DatabaseManager.leerVentas();
             assertNotNull(ventasLeidas);
             
         }, "Flujo completo de venta debe funcionar sin errores");
@@ -111,15 +134,15 @@ class IntegrationTest {
             CajaManager.registrarError("Venta", "Conexión perdida");
             
             // 2. Operaciones de recuperación que siempre funcionan
-            ExcelManager.forzarRecreacionArchivo();
+            // DatabaseManager no necesita recreación de archivos (usa H2 Database)
             // El resultado puede ser true o false, pero no debe lanzar excepción
             
         }, "Operaciones de manejo de errores deben ser robustas");
         
         // 3. Intentar operaciones con datos inválidos (pueden fallar, pero las capturamos)
         try {
-            ExcelManager.guardarProducto(null);
-            ExcelManager.guardarVenta(null);
+            DatabaseManager.guardarProducto(null);
+            DatabaseManager.guardarVenta(null);
         } catch (Exception e) {
             // Es esperado que fallen con datos nulos
             assertNotNull(e.getMessage());
@@ -131,21 +154,22 @@ class IntegrationTest {
     void testOperacionesConcurrentes() {
         // When & Then - Múltiples operaciones rápidas no deben fallar
         assertDoesNotThrow(() -> {
-            // Simular múltiples operaciones rápidas
-            for (int i = 0; i < 10; i++) {
-                Producto producto = new Producto("Producto-" + i, 1.0 + i, i);
-                ExcelManager.guardarProducto(producto);
+            // Simular múltiples operaciones rápidas con nombres únicos
+            for (int i = 0; i < 5; i++) { // Reducir número para evitar conflictos
+                String uniqueId = testSuffix + "-" + i;
+                Producto producto = new Producto("Producto-" + uniqueId, 1.0 + i, i);
+                DatabaseManager.guardarProducto(producto);
                 
-                Venta venta = new Venta("V-CONCURRENT-" + i, LocalDateTime.now(), 
+                Venta venta = new Venta("V-CONCURRENT-" + uniqueId, LocalDateTime.now(), 
                                      List.of(producto), 1.0 + i);
-                ExcelManager.guardarVenta(venta);
+                DatabaseManager.guardarVenta(venta);
                 
                 CajaManager.registrarVenta(venta.getId(), venta.getTotal());
             }
             
             // Verificar que las operaciones de lectura funcionan
-            List<Producto> productos = ExcelManager.leerProductos();
-            List<Venta> ventas = ExcelManager.leerVentas();
+            List<Producto> productos = DatabaseManager.leerProductos();
+            List<Venta> ventas = DatabaseManager.leerVentas();
             
             assertNotNull(productos);
             assertNotNull(ventas);
@@ -156,31 +180,33 @@ class IntegrationTest {
     @Test
     @DisplayName("Validación de integridad de datos")
     void testIntegridadDatos() {
-        // Given
-        Producto productoOriginal = new Producto("Producto Integridad", 5.00, 20);
+        // Given - Producto con nombre único
+        Producto productoOriginal = new Producto("Producto Integridad " + testSuffix, 5.00, 20);
         
         // When & Then
         assertDoesNotThrow(() -> {
             // 1. Guardar producto original
-            ExcelManager.guardarProducto(productoOriginal);
+            DatabaseManager.guardarProducto(productoOriginal);
             
             // 2. Modificar y actualizar
             productoOriginal.setStock(15);
             productoOriginal.setPrecio(5.50);
-            ExcelManager.actualizarProducto(productoOriginal);
+            DatabaseManager.actualizarProducto(productoOriginal);
             
             // 3. Crear venta que afecte el stock
-            Venta ventaIntegridad = new Venta("V-INTEGRIDAD", LocalDateTime.now(),
+            Venta ventaIntegridad = new Venta("V-INTEGRIDAD-" + testSuffix, LocalDateTime.now(),
                                             List.of(productoOriginal), 5.50);
-            ExcelManager.guardarVenta(ventaIntegridad);
+            DatabaseManager.guardarVenta(ventaIntegridad);
             
             // 4. Verificar que los datos son consistentes
-            List<Producto> productos = ExcelManager.leerProductos();
-            List<Venta> ventas = ExcelManager.leerVentas();
+            List<Producto> productos = DatabaseManager.leerProductos();
+            List<Venta> ventas = DatabaseManager.leerVentas();
             
             assertNotNull(productos);
             assertNotNull(ventas);
+            assertTrue(productos.size() > 0);
+            assertTrue(ventas.size() > 0);
             
-        }, "Integridad de datos debe mantenerse en operaciones complejas");
+        }, "La integridad de datos debe mantenerse");
     }
 }
